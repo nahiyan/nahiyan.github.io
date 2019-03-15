@@ -216,10 +216,6 @@ function create ()
 	center_sensor_view.setDepth(-1);
 	center_sensor_view.setAlpha(0.7);
 
-	// car.add(left_sensor_view);
-	// car.add(center_sensor_view);
-	// car.add(right_sensor_view);
-
 	ground_view = this.add.rectangle(200, 300, ground_width, ground_height, 0x007bff);
 	ground_view.x = ground.GetWorldCenter().x * SCALE;
 	ground_view.y = ground.GetWorldCenter().y * SCALE;
@@ -235,11 +231,6 @@ function create ()
 	ray_left_view = this.add.line(0, 0, 0, 0, 0, 0, 0xffffff);
 	ray_right_view = this.add.line(0, 0, 0, 0, 0, 0, 0xffffff);
 	ray_center_view = this.add.line(0, 0, 0, 0, 0, 0, 0xffffff);
-
-	// debug_draw.DrawSegment(
-	// 	new Vec2(0 / SCALE, 0 / SCALE),
-	// 	new Vec2(100 / SCALE, 100 / SCALE),
-	// 	new Box2D.Common.b2Color(255, 255, 255));
 
 	left_sensor_bottom_view = new Phaser.GameObjects.Rectangle(
 		this,
@@ -312,6 +303,8 @@ function create ()
 
 function update (time, delta)
 {
+	lsv = 0, csv = 0, rsv = 0;
+
 	let ray_left_p1 =
 		new Vec2(
 			(left_sensor_bottom_view.getWorldTransformMatrix().e) / SCALE,
@@ -357,8 +350,6 @@ function update (time, delta)
 		ray_center_p2.x * SCALE,
 		ray_center_p2.y * SCALE);
 
-	var lsv = 0, csv = 0, rsv = 0;
-
 	// raycast
 	world.RayCast(
 		function(f, p, n, fr){
@@ -395,12 +386,21 @@ function update (time, delta)
 		ray_center_p1,
 		ray_center_p2);
 
-	// car_body.GetFixtureList()[0].RayCast(
-	// 	function(f, p, d, e) {
-	// 		console.log(f);
-	// 	},
-	// 	Vec2(car_body.GetPosition().x, car_body.GetPosition().y),
-	// 	Vec2(car_body.GetPosition().x - 100 / SCALE, car_body.GetPosition().y - 100 / SCALE));
+	if (lsv == 0)
+		ray_left_view.strokeColor = 0x00ff00;
+	else
+		ray_left_view.strokeColor = 0xff0000;
+
+	if (rsv == 0)
+		ray_right_view.strokeColor = 0x00ff00;
+	else
+		ray_right_view.strokeColor = 0xff0000;
+
+	if (csv == 0)
+		ray_center_view.strokeColor = 0x00ff00;
+	else
+		ray_center_view.strokeColor = 0xff0000;
+
 
 	let speed =
 		Math.round(
@@ -456,17 +456,17 @@ function update (time, delta)
 
 	var output = output_layer(input_layer, current_individual);
 	var steering = 0;
-	var acceleration = 0;
+	var acceleration = 1;
 
-	// if (output[0][0] >= 0.5 && output[0][1] < 0.5) {
-	// 	steering = -1;
-	// 	// steering_text.setText("Steering: Left");
-	// } else if (output[0][1] >= 0.5 && output[0][0] < 0.5) {
-	// 	steering = 1;
-	// 	// steering_text.setText("Steering: Right");
-	// } else {
-	// 	// steering_text.setText("Steering: Straight");
-	// }
+	if (output[0][0] >= 0.5 && output[0][1] < 0.5) {
+		steering = -1;
+		// steering_text.setText("Steering: Left");
+	} else if (output[0][1] >= 0.5 && output[0][0] < 0.5) {
+		steering = 1;
+		// steering_text.setText("Steering: Right");
+	} else {
+		// steering_text.setText("Steering: Straight");
+	}
 
 	steering_text.setText("Steering: " + Math.round(output[0][0] * 100) / 100 + ", " + Math.round(output[0][1] * 100) / 100);
 	
