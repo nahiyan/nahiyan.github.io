@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Neurolution - Test</title>
+		
+		<script src="https://cdn.jsdelivr.net/gh/nicolaspanel/numjs@0.15.1/dist/numjs.min.js"></script>
+	</head>
+	<body>
+		<script src="libs/neural_network/activation_functions.js"></script>
+		<script src="libs/neural_network/main.js"></script>
+		<script src="libs/neural_network/helpers.js"></script>
+		<script src="libs/neural_network/evolution.js"></script>
+		<script src="libs/neural_network/test.js"></script>
+
+		<script type="text/javascript">
+			var layer_sizes = [3, 10, 10, 3];
+
+			var model = new NeuralNetwork(
+		        weights = random_weights(layer_sizes),
+		        biases = random_biases(layer_sizes),
+		        layer_sizes = layer_sizes);
+
+			var mutated = mutate(model, 0.02);
+
+			var evolution_model = initialize_evolution(
+				new Evolution(
+					generations = [],
+					population_size = 10,
+					layer_sizes = [3, 10, 10, 3]));
+		</script>
+	</body>
+</html>

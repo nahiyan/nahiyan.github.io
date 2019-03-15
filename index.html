@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Neurolution</title>
+		<script src="//cdn.jsdelivr.net/npm/phaser@3.16.2/dist/phaser.min.js"></script>
+		<script src="libs/box2d/box2d.min.js"></script>
+		
+		<script src="https://cdn.jsdelivr.net/gh/nicolaspanel/numjs@0.15.1/dist/numjs.min.js"></script>
+
+		<script src="libs/neural_network/activation_functions.js"></script>
+		<script src="libs/neural_network/main.js"></script>
+		<script src="libs/neural_network/helpers.js"></script>
+		<script src="libs/neural_network/evolution.js"></script>
+
+		<style type="text/css">
+			#debug {
+				/*background: pink;*/
+				opacity: 0;
+				position: absolute;
+			}
+		</style>
+	</head>
+	<body>
+		<canvas id="debug" width="700" height="500"></canvas>
+		<script type="text/javascript" src="libs/box2d/box2d_setup.js"></script>
+		<script src="libs/common/neural_network.js"></script>
+		<script src="libs/common/physics.js"></script>
+		<script type="text/javascript" src="classes/RoadTrack.js"></script>
+		<script type="text/javascript" src="libs/phaser/game.js"></script>
+	</body>
+</html>
