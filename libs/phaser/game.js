@@ -19,9 +19,9 @@ var model;
 var ground_width = 700, ground_height = 15;
 var ball_view, car_view;
 var cursors;
-var left_sensor_intersections = 0,
-	right_sensor_intersections = 0,
-	center_sensor_intersections = 0;
+// var left_sensor_intersections = 0,
+// 	right_sensor_intersections = 0,
+// 	center_sensor_intersections = 0;
 
 var world, ball, ground, car_body, front_axle, rear_axle, right_sensor;
 
@@ -216,9 +216,9 @@ function create ()
 	center_sensor_view.setDepth(-1);
 	center_sensor_view.setAlpha(0.7);
 
-	car.add(left_sensor_view);
-	car.add(center_sensor_view);
-	car.add(right_sensor_view);
+	// car.add(left_sensor_view);
+	// car.add(center_sensor_view);
+	// car.add(right_sensor_view);
 
 	ground_view = this.add.rectangle(200, 300, ground_width, ground_height, 0x007bff);
 	ground_view.x = ground.GetWorldCenter().x * SCALE;
@@ -232,16 +232,168 @@ function create ()
 	previous_position = [car.x, car.y];
 	total_distance = 0;
 
-	// ray_view = this.add.line(0, 0, 0, 0, 0, 0, 0xffffff);
+	ray_left_view = this.add.line(0, 0, 0, 0, 0, 0, 0xffffff);
+	ray_right_view = this.add.line(0, 0, 0, 0, 0, 0, 0xffffff);
+	ray_center_view = this.add.line(0, 0, 0, 0, 0, 0, 0xffffff);
+
+	// debug_draw.DrawSegment(
+	// 	new Vec2(0 / SCALE, 0 / SCALE),
+	// 	new Vec2(100 / SCALE, 100 / SCALE),
+	// 	new Box2D.Common.b2Color(255, 255, 255));
+
+	left_sensor_bottom_view = new Phaser.GameObjects.Rectangle(
+		this,
+		-20,
+		-57,
+		0,
+		0,
+		0x0000ff
+	);
+	left_sensor_bottom_view.setAngle(-32);
+	car.add(left_sensor_bottom_view);
+
+	left_sensor_top_view = new Phaser.GameObjects.Rectangle(
+		this,
+		-70,
+		-133,
+		0,
+		0,
+		0x0000ff
+	);
+	left_sensor_top_view.setAngle(-32);
+	car.add(left_sensor_top_view);
+
+	right_sensor_bottom_view = new Phaser.GameObjects.Rectangle(
+		this,
+		20,
+		-57,
+		0,
+		0,
+		0x0000ff
+	);
+	right_sensor_bottom_view.setAngle(32);
+	car.add(right_sensor_bottom_view);
+	
+
+	right_sensor_top_view = new Phaser.GameObjects.Rectangle(
+		this,
+		70,
+		-133,
+		0,
+		0,
+		0x0000ff
+	);
+	right_sensor_top_view.setAngle(32);
+	car.add(right_sensor_top_view);
+
+	center_sensor_bottom_view = new Phaser.GameObjects.Rectangle(
+		this,
+		0,
+		-60,
+		0,
+		0,
+		0x0000ff
+	);
+	center_sensor_bottom_view.setAngle(0);
+	car.add(center_sensor_bottom_view);
+	
+
+	center_sensor_top_view = new Phaser.GameObjects.Rectangle(
+		this,
+		0,
+		-170,
+		0,
+		0,
+		0x0000ff
+	);
+	center_sensor_top_view.setAngle(0);
+	car.add(center_sensor_top_view);
 }
 
 function update (time, delta)
 {
-	// ray_view.setTo(
-	// 	car_body.GetPosition().x * SCALE,
-	// 	car_body.GetPosition().y * SCALE,
-	// 	car_body.GetPosition().x * SCALE - 100,
-	// 	car_body.GetPosition().y * SCALE - 100);
+	let ray_left_p1 =
+		new Vec2(
+			(left_sensor_bottom_view.getWorldTransformMatrix().e) / SCALE,
+			(left_sensor_bottom_view.getWorldTransformMatrix().f) / SCALE);
+	let ray_left_p2 =
+		new Vec2(
+			(left_sensor_top_view.getWorldTransformMatrix().e) / SCALE,
+			(left_sensor_top_view.getWorldTransformMatrix().f) / SCALE);
+
+	let ray_right_p1 =
+		new Vec2(
+			(right_sensor_bottom_view.getWorldTransformMatrix().e) / SCALE,
+			(right_sensor_bottom_view.getWorldTransformMatrix().f) / SCALE);
+	let ray_right_p2 =
+		new Vec2(
+			(right_sensor_top_view.getWorldTransformMatrix().e) / SCALE,
+			(right_sensor_top_view.getWorldTransformMatrix().f) / SCALE);
+
+	let ray_center_p1 =
+		new Vec2(
+			(center_sensor_bottom_view.getWorldTransformMatrix().e) / SCALE,
+			(center_sensor_bottom_view.getWorldTransformMatrix().f) / SCALE);
+	let ray_center_p2 =
+		new Vec2(
+			(center_sensor_top_view.getWorldTransformMatrix().e) / SCALE,
+			(center_sensor_top_view.getWorldTransformMatrix().f) / SCALE);
+
+	ray_left_view.setTo(
+		ray_left_p1.x * SCALE,
+		ray_left_p1.y * SCALE,
+		ray_left_p2.x * SCALE,
+		ray_left_p2.y * SCALE);
+
+	ray_right_view.setTo(
+		ray_right_p1.x * SCALE,
+		ray_right_p1.y * SCALE,
+		ray_right_p2.x * SCALE,
+		ray_right_p2.y * SCALE);
+
+	ray_center_view.setTo(
+		ray_center_p1.x * SCALE,
+		ray_center_p1.y * SCALE,
+		ray_center_p2.x * SCALE,
+		ray_center_p2.y * SCALE);
+
+	var lsv = 0, csv = 0, rsv = 0;
+
+	// raycast
+	world.RayCast(
+		function(f, p, n, fr){
+			// console.log(f.GetUserData(), fr);
+			if (f.GetUserData() == "track") {
+				lsv = Math.round(fr * 100) / 100;
+			}
+			
+			return 0;
+		},
+		ray_left_p1,
+		ray_left_p2);
+
+	world.RayCast(
+		function(f, p, n, fr){
+			if (f.GetUserData() == "track") {
+				rsv = Math.round(fr * 100) / 100;
+			}
+			
+			return 0;
+		},
+		ray_right_p1,
+		ray_right_p2);
+
+	world.RayCast(
+		function(f, p, n, fr){
+			// console.log(f.GetUserData(), fr);
+			if (f.GetUserData() == "track") {
+				csv = Math.round(fr * 100) / 100;
+			}
+			
+			return 0;
+		},
+		ray_center_p1,
+		ray_center_p2);
 
 	// car_body.GetFixtureList()[0].RayCast(
 	// 	function(f, p, d, e) {
@@ -286,14 +438,14 @@ function update (time, delta)
 
 	// neural network
 
-	var lsv = 0, rsv = 0, csv = 0;
+	// var lsv = 0, rsv = 0, csv = 0;
 
-	if (left_sensor_intersections >= 1)
-		lsv = 1;
-	if (right_sensor_intersections >= 1)
-		rsv = 1;
-	if (center_sensor_intersections >= 1)
-		csv = 1;
+	// if (left_sensor_intersections >= 1)
+	// 	lsv = 1;
+	// if (right_sensor_intersections >= 1)
+	// 	rsv = 1;
+	// if (center_sensor_intersections >= 1)
+	// 	csv = 1;
 
 	sensors_text.setText("Sensors: " + lsv + ", " + csv + ", " + rsv);
 	sensors_text.setPosition(this.cameras.main.scrollX + 5, this.cameras.main.scrollY + 110);

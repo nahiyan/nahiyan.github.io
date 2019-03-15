@@ -173,122 +173,127 @@ function setup_physics(scene) {
 
 	// create sensors
 
-	var left_sensor_fix_def = new box2d.b2FixtureDef();
-	left_sensor_fix_def.density = 1;
-	left_sensor_fix_def.isSensor = true;
-	left_sensor_fix_def.shape = new box2d.b2PolygonShape();
-	left_sensor_fix_def.shape.SetAsEdge(
-		new Vec2(
-			0 / SCALE,
-			-20 / SCALE
-		),
-		new Vec2(
-			-70 / SCALE,
-			-130 / SCALE
-		)
-	);
-	left_sensor_fix_def.userData = "left_sensor";
-	car_body.CreateFixture(left_sensor_fix_def);
+	// var left_sensor_fix_def = new box2d.b2FixtureDef();
+	// left_sensor_fix_def.density = 1;
+	// left_sensor_fix_def.isSensor = true;
+	// left_sensor_fix_def.shape = new box2d.b2PolygonShape();
+	// left_sensor_fix_def.shape.SetAsEdge(
+	// 	new Vec2(
+	// 		0 / SCALE,
+	// 		-20 / SCALE
+	// 	),
+	// 	new Vec2(
+	// 		-70 / SCALE,
+	// 		-130 / SCALE
+	// 	)
+	// );
+	// left_sensor_fix_def.userData = "left_sensor";
+	// car_body.CreateFixture(left_sensor_fix_def);
 
-	var right_sensor_fix_def = new box2d.b2FixtureDef();
-	right_sensor_fix_def.density = 1;
-	right_sensor_fix_def.isSensor = true;
-	right_sensor_fix_def.shape = new box2d.b2PolygonShape();
-	right_sensor_fix_def.shape.SetAsEdge(
-		new Vec2(
-			0 / SCALE,
-			-20 / SCALE
-		),
-		new Vec2(
-			70 / SCALE,
-			-135 / SCALE
-		)
-	);
-	right_sensor_fix_def.userData = "right_sensor";
-	right_sensor = car_body.CreateFixture(right_sensor_fix_def);
+	// var right_sensor_fix_def = new box2d.b2FixtureDef();
+	// right_sensor_fix_def.density = 1;
+	// right_sensor_fix_def.isSensor = true;
+	// right_sensor_fix_def.shape = new box2d.b2PolygonShape();
+	// right_sensor_fix_def.shape.SetAsEdge(
+	// 	new Vec2(
+	// 		0 / SCALE,
+	// 		-20 / SCALE
+	// 	),
+	// 	new Vec2(
+	// 		70 / SCALE,
+	// 		-135 / SCALE
+	// 	)
+	// );
+	// right_sensor_fix_def.userData = "right_sensor";
+	// right_sensor = car_body.CreateFixture(right_sensor_fix_def);
 
-	var center_sensor_fix_def = new box2d.b2FixtureDef();
-	center_sensor_fix_def.density = 1;
-	center_sensor_fix_def.isSensor = true;
-	center_sensor_fix_def.shape = new box2d.b2PolygonShape();
-	center_sensor_fix_def.shape.SetAsEdge(
-		new Vec2(
-			0 / SCALE,
-			-20 / SCALE
-		),
-		new Vec2(
-			0 / SCALE,
-			-170 / SCALE
-		)
-	);
-	center_sensor_fix_def.userData = "center_sensor";
-	car_body.CreateFixture(center_sensor_fix_def);
+	// var center_sensor_fix_def = new box2d.b2FixtureDef();
+	// center_sensor_fix_def.density = 1;
+	// center_sensor_fix_def.isSensor = true;
+	// center_sensor_fix_def.shape = new box2d.b2PolygonShape();
+	// center_sensor_fix_def.shape.SetAsEdge(
+	// 	new Vec2(
+	// 		0 / SCALE,
+	// 		-20 / SCALE
+	// 	),
+	// 	new Vec2(
+	// 		0 / SCALE,
+	// 		-170 / SCALE
+	// 	)
+	// );
+	// center_sensor_fix_def.userData = "center_sensor";
+	// car_body.CreateFixture(center_sensor_fix_def);
 
 	// debug draw
 
-	var debug_draw = new box2d.b2DebugDraw();
+	debug_draw = new box2d.b2DebugDraw();
 	debug_draw.SetSprite(document.getElementById("debug").getContext('2d'));
 	debug_draw.SetDrawScale(SCALE);
 	debug_draw.SetFlags(box2d.b2DebugDraw.e_shapeBit | box2d.b2DebugDraw.e_jointBit);
 	world.SetDebugDraw(debug_draw);
 
+	// debug_draw.DrawSegment(
+	// 	new Vec2(100 / SCALE, 100 / SCALE),
+	// 	new Vec2(500 / SCALE, 500 / SCALE),
+	// 	new Box2D.Common.b2Color(255, 255, 255));
+
 
 	// contact listener
 
-	var contact_listener = new box2d.b2ContactListener();
-	contact_listener.BeginContact = function(c) {
-		if (c.GetFixtureA().GetUserData() == "left_sensor"){
-			left_sensor_view.fillColor = 0xff0000;
-			left_sensor_view.setAlpha(1);
+	// var contact_listener = new box2d.b2ContactListener();
+	// contact_listener.BeginContact = function(c) {
+	// 	if (c.GetFixtureA().GetUserData() == "left_sensor"){
+	// 		left_sensor_view.fillColor = 0xff0000;
+	// 		left_sensor_view.setAlpha(1);
 
-			left_sensor_intersections += 1;
-		}
+	// 		left_sensor_intersections += 1;
+	// 	}
 
-		if (c.GetFixtureA().GetUserData() == "center_sensor") {
-			center_sensor_view.fillColor = 0xff0000;
-			center_sensor_view.setAlpha(1);
+	// 	if (c.GetFixtureA().GetUserData() == "center_sensor") {
+	// 		center_sensor_view.fillColor = 0xff0000;
+	// 		center_sensor_view.setAlpha(1);
 
-			center_sensor_intersections += 1;
-		}
+	// 		center_sensor_intersections += 1;
+	// 	}
 
-		if (c.GetFixtureA().GetUserData() == "right_sensor") {
-			right_sensor_view.fillColor = 0xff0000;
-			right_sensor_view.setAlpha(1);
+	// 	if (c.GetFixtureA().GetUserData() == "right_sensor") {
+	// 		right_sensor_view.fillColor = 0xff0000;
+	// 		right_sensor_view.setAlpha(1);
 
-			right_sensor_intersections += 1;
-		}
+	// 		right_sensor_intersections += 1;
+	// 	}
 
-		if (c.GetFixtureA().GetUserData() == "car" && c.GetFixtureB().GetUserData() == "track")
-			gameover(scene);
-	};
+	// 	if (c.GetFixtureA().GetUserData() == "car" && c.GetFixtureB().GetUserData() == "track")
+	// 		gameover(scene);
+	// };
 
-	contact_listener.EndContact = function(c) {
-		if (c.GetFixtureA().GetUserData() == "right_sensor") {
-			right_sensor_intersections -= 1;
+	// contact_listener.EndContact = function(c) {
+	// 	if (c.GetFixtureA().GetUserData() == "right_sensor") {
+	// 		right_sensor_intersections -= 1;
 
-			if (right_sensor_intersections == 0) {
-				right_sensor_view.fillColor = 0x00ff00;
-				right_sensor_view.setAlpha(0.7);
-			}
-		}
-		if (c.GetFixtureA().GetUserData() == "left_sensor") {
-			left_sensor_intersections -= 1;
-			if (left_sensor_intersections == 0) {
-				left_sensor_view.fillColor = 0x00ff00;
-				left_sensor_view.setAlpha(0.7);
-			}
-		}
-		if (c.GetFixtureA().GetUserData() == "center_sensor") {
-			center_sensor_intersections -= 1;
+	// 		if (right_sensor_intersections == 0) {
+	// 			right_sensor_view.fillColor = 0x00ff00;
+	// 			right_sensor_view.setAlpha(0.7);
+	// 		}
+	// 	}
+	// 	if (c.GetFixtureA().GetUserData() == "left_sensor") {
+	// 		left_sensor_intersections -= 1;
+	// 		if (left_sensor_intersections == 0) {
+	// 			left_sensor_view.fillColor = 0x00ff00;
+	// 			left_sensor_view.setAlpha(0.7);
+	// 		}
+	// 	}
+	// 	if (c.GetFixtureA().GetUserData() == "center_sensor") {
+	// 		center_sensor_intersections -= 1;
 
-			if (center_sensor_intersections == 0) {
-				center_sensor_view.fillColor = 0x00ff00;
-				center_sensor_view.setAlpha(0.7);
-			}
-		}
-	};
+	// 		if (center_sensor_intersections == 0) {
+	// 			center_sensor_view.fillColor = 0x00ff00;
+	// 			center_sensor_view.setAlpha(0.7);
+	// 		}
+	// 	}
+	// };
 
-	world.SetContactListener(contact_listener);
+	// world.SetContactListener(contact_listener);
 
 	// road track
 
