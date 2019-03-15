@@ -179,6 +179,63 @@ function setup_physics(scene) {
 	debug_draw.SetFlags(box2d.b2DebugDraw.e_shapeBit | box2d.b2DebugDraw.e_jointBit);
 	world.SetDebugDraw(debug_draw);
 
+	// contact listener
+
+	var contact_listener = new box2d.b2ContactListener();
+	contact_listener.BeginContact = function(c) {
+		if (c.GetFixtureA().GetUserData() == "left_sensor"){
+			left_sensor_view.fillColor = 0xff0000;
+			left_sensor_view.setAlpha(1);
+
+			left_sensor_intersections += 1;
+		}
+
+		if (c.GetFixtureA().GetUserData() == "center_sensor") {
+			center_sensor_view.fillColor = 0xff0000;
+			center_sensor_view.setAlpha(1);
+
+			center_sensor_intersections += 1;
+		}
+
+		if (c.GetFixtureA().GetUserData() == "right_sensor") {
+			right_sensor_view.fillColor = 0xff0000;
+			right_sensor_view.setAlpha(1);
+
+			right_sensor_intersections += 1;
+		}
+
+		if (c.GetFixtureA().GetUserData() == "car" && c.GetFixtureB().GetUserData() == "track")
+			gameover(scene);
+	};
+
+	contact_listener.EndContact = function(c) {
+		if (c.GetFixtureA().GetUserData() == "right_sensor") {
+			right_sensor_intersections -= 1;
+
+			if (right_sensor_intersections == 0) {
+				right_sensor_view.fillColor = 0x00ff00;
+				right_sensor_view.setAlpha(0.7);
+			}
+		}
+		if (c.GetFixtureA().GetUserData() == "left_sensor") {
+			left_sensor_intersections -= 1;
+			if (left_sensor_intersections == 0) {
+				left_sensor_view.fillColor = 0x00ff00;
+				left_sensor_view.setAlpha(0.7);
+			}
+		}
+		if (c.GetFixtureA().GetUserData() == "center_sensor") {
+			center_sensor_intersections -= 1;
+
+			if (center_sensor_intersections == 0) {
+				center_sensor_view.fillColor = 0x00ff00;
+				center_sensor_view.setAlpha(0.7);
+			}
+		}
+	};
+
+	world.SetContactListener(contact_listener);
+
 	// road track
 
 	var road_tracks_left = new RoadTrack(world, game.scene.scenes[0]);

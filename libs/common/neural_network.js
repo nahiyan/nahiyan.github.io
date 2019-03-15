@@ -5,7 +5,7 @@ function setup_neural_network() {
 		new Evolution(
 			generations = [],
 			population_size = 10,
-			layer_sizes = [3, 5, 2]));
+			layer_sizes = [3, 2, 2, 2]));
 
 	current_individual = get_individual(current_individual_index, model);
 }

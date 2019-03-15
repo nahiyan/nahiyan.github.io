@@ -355,7 +355,7 @@ function update (time, delta)
 		function(f, p, n, fr){
 			// console.log(f.GetUserData(), fr);
 			if (f.GetUserData() == "track") {
-				lsv = Math.round(fr * 100) / 100;
+				lsv = Math.round((1 - fr) * 100) / 100;
 			}
 			
 			return 0;
@@ -366,7 +366,7 @@ function update (time, delta)
 	world.RayCast(
 		function(f, p, n, fr){
 			if (f.GetUserData() == "track") {
-				rsv = Math.round(fr * 100) / 100;
+				rsv = Math.round((1 - fr) * 100) / 100;
 			}
 			
 			return 0;
@@ -378,7 +378,7 @@ function update (time, delta)
 		function(f, p, n, fr){
 			// console.log(f.GetUserData(), fr);
 			if (f.GetUserData() == "track") {
-				csv = Math.round(fr * 100) / 100;
+				csv = Math.round((1 - fr) * 100) / 100;
 			}
 			
 			return 0;
@@ -455,17 +455,19 @@ function update (time, delta)
 	];
 
 	var output = output_layer(input_layer, current_individual);
+	var output_non_activated =
+		last_non_activated_layer(
+			forward_propagate(current_individual));
+		
 	var steering = 0;
 	var acceleration = 1;
 
-	if (output[0][0] >= 0.5 && output[0][1] < 0.5) {
+	if (output[0][0] - output[0][1] >= 0.01) {
 		steering = -1;
 		// steering_text.setText("Steering: Left");
-	} else if (output[0][1] >= 0.5 && output[0][0] < 0.5) {
+	} else if (output[0][1] - output[0][0] >= 0.01) {
 		steering = 1;
 		// steering_text.setText("Steering: Right");
-	} else {
-		// steering_text.setText("Steering: Straight");
 	}
 
 	steering_text.setText("Steering: " + Math.round(output[0][0] * 100) / 100 + ", " + Math.round(output[0][1] * 100) / 100);
