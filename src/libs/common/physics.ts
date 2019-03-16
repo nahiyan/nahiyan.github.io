@@ -69,21 +69,21 @@ function setup_physics(scene: any) {
 		scene: scene
 	}
 
-	road_tracks_left = add_segment(road_tracks_left, [100, 415], deg_to_rad(0));
-	road_tracks_left = add_segment(road_tracks_left, [-7, 2], deg_to_rad(-10));
-	road_tracks_left = add_segment(road_tracks_left, [5, 2], deg_to_rad(10));
-	road_tracks_left = add_segment(road_tracks_left, [40, 5], deg_to_rad(20));
-	road_tracks_left = add_segment(road_tracks_left, [40, 5], deg_to_rad(10));
-	road_tracks_left = add_segment(road_tracks_left, [5, 5], deg_to_rad(-10));
-	road_tracks_left = add_segment(road_tracks_left, [-33, 7], deg_to_rad(-20));
-	road_tracks_left = add_segment(road_tracks_left, [-63, 20], deg_to_rad(-40));
-	road_tracks_left = add_segment(road_tracks_left, [-94, 41], deg_to_rad(-50));
-	road_tracks_left = add_segment(road_tracks_left, [-75, 30], deg_to_rad(-20));
-	road_tracks_left = add_segment(road_tracks_left, [-19, 7], deg_to_rad(0));
-	road_tracks_left = add_segment(road_tracks_left, [28, 7], deg_to_rad(20));
-	road_tracks_left = add_segment(road_tracks_left, [63, 15], deg_to_rad(30));
-	road_tracks_left = add_segment(road_tracks_left, [88, 31], deg_to_rad(45));
-	road_tracks_left = add_segment(road_tracks_left, [105, 55], deg_to_rad(55));
+	road_tracks_left = add_road_track_segment(road_tracks_left, [100, 415], deg_to_rad(0));
+	road_tracks_left = add_road_track_segment(road_tracks_left, [-7, 2], deg_to_rad(-10));
+	road_tracks_left = add_road_track_segment(road_tracks_left, [5, 2], deg_to_rad(10));
+	road_tracks_left = add_road_track_segment(road_tracks_left, [40, 5], deg_to_rad(20));
+	road_tracks_left = add_road_track_segment(road_tracks_left, [40, 5], deg_to_rad(10));
+	road_tracks_left = add_road_track_segment(road_tracks_left, [5, 5], deg_to_rad(-10));
+	road_tracks_left = add_road_track_segment(road_tracks_left, [-33, 7], deg_to_rad(-20));
+	road_tracks_left = add_road_track_segment(road_tracks_left, [-63, 20], deg_to_rad(-40));
+	road_tracks_left = add_road_track_segment(road_tracks_left, [-94, 41], deg_to_rad(-50));
+	road_tracks_left = add_road_track_segment(road_tracks_left, [-75, 30], deg_to_rad(-20));
+	road_tracks_left = add_road_track_segment(road_tracks_left, [-19, 7], deg_to_rad(0));
+	road_tracks_left = add_road_track_segment(road_tracks_left, [28, 7], deg_to_rad(20));
+	road_tracks_left = add_road_track_segment(road_tracks_left, [63, 15], deg_to_rad(30));
+	road_tracks_left = add_road_track_segment(road_tracks_left, [88, 31], deg_to_rad(45));
+	road_tracks_left = add_road_track_segment(road_tracks_left, [105, 55], deg_to_rad(55));
 
 	var road_tracks_right: RoadTrackModel = {
 		h: 70,
@@ -92,18 +92,18 @@ function setup_physics(scene: any) {
 		scene: scene
 	}
 
-	road_tracks_right = add_segment(road_tracks_right, [270, 415], deg_to_rad(0));
-	road_tracks_right = add_segment(road_tracks_right, [-7, 2], deg_to_rad(-10));
-	road_tracks_right = add_segment(road_tracks_right, [5, 2], deg_to_rad(10));
-	road_tracks_right = add_segment(road_tracks_right, [40, 5], deg_to_rad(20));
-	road_tracks_right = add_segment(road_tracks_right, [40, 5], deg_to_rad(10));
-	road_tracks_right = add_segment(road_tracks_right, [5, 5], deg_to_rad(-10));
-	road_tracks_right = add_segment(road_tracks_right, [-33, 7], deg_to_rad(-20));
-	road_tracks_right = add_segment(road_tracks_right, [-63, 20], deg_to_rad(-40));
-	road_tracks_right = add_segment(road_tracks_right, [-94, 41], deg_to_rad(-50));
-	road_tracks_right = add_segment(road_tracks_right, [-75, 30], deg_to_rad(-20));
-	road_tracks_right = add_segment(road_tracks_right, [-19, 7], deg_to_rad(0));
-	road_tracks_right = add_segment(road_tracks_right, [28, 7], deg_to_rad(20));
-	road_tracks_right = add_segment(road_tracks_right, [73, 21], deg_to_rad(40));
-	road_tracks_right = add_segment(road_tracks_right, [105, 47], deg_to_rad(55));
+	road_tracks_right = add_road_track_segment(road_tracks_right, [270, 415], deg_to_rad(0));
+	road_tracks_right = add_road_track_segment(road_tracks_right, [-7, 2], deg_to_rad(-10));
+	road_tracks_right = add_road_track_segment(road_tracks_right, [5, 2], deg_to_rad(10));
+	road_tracks_right = add_road_track_segment(road_tracks_right, [40, 5], deg_to_rad(20));
+	road_tracks_right = add_road_track_segment(road_tracks_right, [40, 5], deg_to_rad(10));
+	road_tracks_right = add_road_track_segment(road_tracks_right, [5, 5], deg_to_rad(-10));
+	road_tracks_right = add_road_track_segment(road_tracks_right, [-33, 7], deg_to_rad(-20));
+	road_tracks_right = add_road_track_segment(road_tracks_right, [-63, 20], deg_to_rad(-40));
+	road_tracks_right = add_road_track_segment(road_tracks_right, [-94, 41], deg_to_rad(-50));
+	road_tracks_right = add_road_track_segment(road_tracks_right, [-75, 30], deg_to_rad(-20));
+	road_tracks_right = add_road_track_segment(road_tracks_right, [-19, 7], deg_to_rad(0));
+	road_tracks_right = add_road_track_segment(road_tracks_right, [28, 7], deg_to_rad(20));
+	road_tracks_right = add_road_track_segment(road_tracks_right, [73, 21], deg_to_rad(40));
+	road_tracks_right = add_road_track_segment(road_tracks_right, [105, 47], deg_to_rad(55));
 }

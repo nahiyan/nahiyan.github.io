@@ -54,8 +54,8 @@ function setup_physics(scene) {
         if (c.GetFixtureA().GetUserData() == "car" && c.GetFixtureB().GetUserData() == "track")
             gameover(scene, scene.time.now());
     };
-    contact_listener.EndContact = function (c) {
-    };
+    // contact_listener.EndContact = function(c) {
+    // };
     world.SetContactListener(contact_listener);
     // road track
     var road_tracks_left = {
@@ -117,183 +117,6 @@ function sigmoid(x) {
 }
 function sigmoid_prime(x) {
     return Math.exp(-x) / Math.pow(1 + Math.exp(-x), 2);
-}
-// // model representing evolution
-// class Evolution {
-//     constructor(
-//         generations = [],
-//         population_size = 10,
-//         layer_sizes = [3, 10, 10, 2]) {
-//         // evolution data
-//         this.generations = generations;
-//         this.population_size = population_size;
-//         this.layer_sizes = layer_sizes;
-//     }
-// }
-// // randomly mutate the weights and biases of a NN based on the amount
-// function mutate(nn, amount) {
-// 	// weights
-// 	var new_weights = [];
-// 	// i -> matrix representing weights between 2 layers
-// 	for (var i in range(len(nn.weights))) {
-// 		new_weights.push([]);
-// 		let size_y = len(nn.weights[i]);
-// 		let size_x = len(nn.weights[i][0]);
-// 		for (var j in range(size_y)) {
-// 			new_weights[i].push([]);
-// 			for (var k in range(size_x)) {
-// 				new_weights[i][j].push([]);
-// 				let random_variation = nn.weights[i][j][k] * amount;
-// 				let r = random(-random_variation, random_variation);
-// 				new_weights[i][j][k] = nn.weights[i][j][k] + r;
-// 			}
-// 		}
-// 	}
-// 	var new_biases = [];
-// 	for (var i in range(len(nn.biases))) {
-// 		new_biases.push([[]]);
-// 		let size = len(nn.biases[i][0]);
-// 		for (var j in range(size)) {
-// 			let random_variation = nn.biases[i][0][j] * amount;
-// 			let r = random(-random_variation, random_variation);
-// 			new_biases[i][0].push(nn.biases[i][0][j] + r);
-// 		}
-// 	}
-// 	let new_nn = clone_nn(nn);
-// 	new_nn.weights = new_weights;
-// 	new_nn.biases = new_biases;
-// 	console.log(new_nn);
-// 	return new_nn;
-// }
-// // spawn the first generation randomly
-// function initialize_evolution(model) {
-// 	var new_model = clone(model);
-// 	new_model.generations.push([]);
-// 	for (var i in range(model.population_size)) {
-// 		let neural_network =
-// 			new NeuralNetwork(
-// 				weights = random_weights(model.layer_sizes),
-// 		        biases = random_biases(model.layer_sizes),
-// 		        layer_sizes = model.layer_sizes);
-// 		new_model.generations[0].push(neural_network);
-// 	}
-// 	return new_model;
-// }
-// function fitness(distance, avg_speed) {
-// 	return distance * avg_speed;
-// }
-// function last_generation(model) {
-// 	return model.generations[len(model.generations) - 1];
-// }
-// function new_generation(model) {
-// 	let selection_count = 6;
-// 	let mutation_rate = 0.2;
-// 	// natural selection
-// 	model = best_fit_select(model, selection_count);
-// 	// cross over to fill the vacant spots
-// 	let lg = last_generation(model);
-// 	while (len(lg) != model.population_size) {
-// 		var random_nn_a = lg[
-// 			Math.floor(
-// 				Math.random() * lg.length)];
-// 		var random_nn_b = lg[
-// 			Math.floor(
-// 				Math.random() * lg.length)];
-// 		lg.push(
-// 			crossover(
-// 				random_nn_a, random_nn_b));
-// 	}
-// 	model.generations[len(model.generations)] = lg;
-// 	// mutate the neural networks
-// 	for (var i = 0; i < len(lg); i++) {
-// 		model.generations[len(model.generations) - 1][i] = mutate(model.generations[len(model.generations) - 1][i], mutation_rate);
-// 	}
-// 	return model;
-// }
-// function get_individual(current_individual_index, model) {
-// 	return model.generations
-// 		[current_individual_index[0]]
-// 		[current_individual_index[1]];
-// }
-// function increment(index, model) {
-// 	let current_generation_index = index[0];
-// 	let current_individual_index = index[1];
-// 	let new_generation_index = current_generation_index;
-// 	let new_individual_index = current_individual_index;
-// 	if (current_individual_index == model.population_size - 1) {
-// 		new_generation_index = current_generation_index + 1;
-// 		new_individual_index = 0;
-// 	} else {
-// 		new_individual_index++;
-// 	}
-// 	return [new_generation_index, new_individual_index];
-// }
-// function set_fitness(value, index, model) {
-// 	model.generations[index[0]][index[1]].fitness = value;
-// 	return model;
-// }
-// // takes two parents and generates a child
-// function crossover(parent_a, parent_b) {
-// 	// weights
-// 	new_weights = [];
-// 	// i -> matrix representing weights between 2 layers
-// 	for (var i in range(len(parent_a.weights))) {
-// 		new_weights.push([]);
-// 		let size_y = len(parent_a.weights[i]);
-// 		let size_x = len(parent_a.weights[i][0]);
-// 		for (var j in range(size_y)) {
-// 			new_weights[i].push([]);
-// 			for (var k in range(size_x)) {
-// 				new_weights[i][j].push([]);
-// 				if (Math.round(random(0, 0)) == 0)
-// 					new_weights[i][j][k] = parent_a.weights[i][j][k];
-// 				else
-// 					new_weights[i][j][k] = parent_b.weights[i][j][k];
-// 			}
-// 		}
-// 	}
-// 	// TODO: Biases
-// 	// child
-// 	let child = new NeuralNetwork(
-// 		weights = new_weights,
-// 		biases = parent_a.biases,
-// 		layer_sizes = parent_a.layer_sizes,
-// 		layers = []
-// 		);
-// 	child.fitness = undefined;
-// 	return child;
-// }
-// function best_fit_select(model, quantity) {
-// 	let individuals = last_generation(model);
-// 	individuals.sort(function(a, b){
-// 		return b.fitness - a.fitness;
-// 	});
-// 	let selected_individuals = individuals.splice(0, quantity);
-// 	model.generations[len(model.generations) - 1] = selected_individuals;
-// 	return model;
-// }
-// function clone_nn(nn) {
-//     let new_nn = new NeuralNetwork(
-//         weights = nn.weights,
-//         biases = nn.biases,
-//         layer_sizes = nn.layer_sizes,
-//         layers = nn.layers,
-//         non_activated_layers = nn.non_activated_layers);
-function random(min, max) {
-    return Math.random() * (max - min) + min;
-}
-function add(a, b) {
-    return new Vec2(a.x + b.x, a.y + b.y);
-}
-function rad_to_deg(value) {
-    // 1 pi rad = 180 deg
-    // x rad = (180 / pi) * x
-    return value * (180 / Math.PI);
-}
-function deg_to_rad(value) {
-    // 180 deg = 1 pi rad
-    // x deg = (1 pi / 180) * x
-    return (Math.PI / 180) * value;
 }
 // function range(size, startAt = 0) {
 //     return [...Array(size).keys()].map(i => i + startAt);
@@ -556,6 +379,183 @@ function deg_to_rad(value) {
 //     }
 //     return forward_propagate(model);
 // }
+// // model representing evolution
+// class Evolution {
+//     constructor(
+//         generations = [],
+//         population_size = 10,
+//         layer_sizes = [3, 10, 10, 2]) {
+//         // evolution data
+//         this.generations = generations;
+//         this.population_size = population_size;
+//         this.layer_sizes = layer_sizes;
+//     }
+// }
+// // randomly mutate the weights and biases of a NN based on the amount
+// function mutate(nn, amount) {
+// 	// weights
+// 	var new_weights = [];
+// 	// i -> matrix representing weights between 2 layers
+// 	for (var i in range(len(nn.weights))) {
+// 		new_weights.push([]);
+// 		let size_y = len(nn.weights[i]);
+// 		let size_x = len(nn.weights[i][0]);
+// 		for (var j in range(size_y)) {
+// 			new_weights[i].push([]);
+// 			for (var k in range(size_x)) {
+// 				new_weights[i][j].push([]);
+// 				let random_variation = nn.weights[i][j][k] * amount;
+// 				let r = random(-random_variation, random_variation);
+// 				new_weights[i][j][k] = nn.weights[i][j][k] + r;
+// 			}
+// 		}
+// 	}
+// 	var new_biases = [];
+// 	for (var i in range(len(nn.biases))) {
+// 		new_biases.push([[]]);
+// 		let size = len(nn.biases[i][0]);
+// 		for (var j in range(size)) {
+// 			let random_variation = nn.biases[i][0][j] * amount;
+// 			let r = random(-random_variation, random_variation);
+// 			new_biases[i][0].push(nn.biases[i][0][j] + r);
+// 		}
+// 	}
+// 	let new_nn = clone_nn(nn);
+// 	new_nn.weights = new_weights;
+// 	new_nn.biases = new_biases;
+// 	console.log(new_nn);
+// 	return new_nn;
+// }
+// // spawn the first generation randomly
+// function initialize_evolution(model) {
+// 	var new_model = clone(model);
+// 	new_model.generations.push([]);
+// 	for (var i in range(model.population_size)) {
+// 		let neural_network =
+// 			new NeuralNetwork(
+// 				weights = random_weights(model.layer_sizes),
+// 		        biases = random_biases(model.layer_sizes),
+// 		        layer_sizes = model.layer_sizes);
+// 		new_model.generations[0].push(neural_network);
+// 	}
+// 	return new_model;
+// }
+// function fitness(distance, avg_speed) {
+// 	return distance * avg_speed;
+// }
+// function last_generation(model) {
+// 	return model.generations[len(model.generations) - 1];
+// }
+// function new_generation(model) {
+// 	let selection_count = 6;
+// 	let mutation_rate = 0.2;
+// 	// natural selection
+// 	model = best_fit_select(model, selection_count);
+// 	// cross over to fill the vacant spots
+// 	let lg = last_generation(model);
+// 	while (len(lg) != model.population_size) {
+// 		var random_nn_a = lg[
+// 			Math.floor(
+// 				Math.random() * lg.length)];
+// 		var random_nn_b = lg[
+// 			Math.floor(
+// 				Math.random() * lg.length)];
+// 		lg.push(
+// 			crossover(
+// 				random_nn_a, random_nn_b));
+// 	}
+// 	model.generations[len(model.generations)] = lg;
+// 	// mutate the neural networks
+// 	for (var i = 0; i < len(lg); i++) {
+// 		model.generations[len(model.generations) - 1][i] = mutate(model.generations[len(model.generations) - 1][i], mutation_rate);
+// 	}
+// 	return model;
+// }
+// function get_individual(current_individual_index, model) {
+// 	return model.generations
+// 		[current_individual_index[0]]
+// 		[current_individual_index[1]];
+// }
+// function increment(index, model) {
+// 	let current_generation_index = index[0];
+// 	let current_individual_index = index[1];
+// 	let new_generation_index = current_generation_index;
+// 	let new_individual_index = current_individual_index;
+// 	if (current_individual_index == model.population_size - 1) {
+// 		new_generation_index = current_generation_index + 1;
+// 		new_individual_index = 0;
+// 	} else {
+// 		new_individual_index++;
+// 	}
+// 	return [new_generation_index, new_individual_index];
+// }
+// function set_fitness(value, index, model) {
+// 	model.generations[index[0]][index[1]].fitness = value;
+// 	return model;
+// }
+// // takes two parents and generates a child
+// function crossover(parent_a, parent_b) {
+// 	// weights
+// 	new_weights = [];
+// 	// i -> matrix representing weights between 2 layers
+// 	for (var i in range(len(parent_a.weights))) {
+// 		new_weights.push([]);
+// 		let size_y = len(parent_a.weights[i]);
+// 		let size_x = len(parent_a.weights[i][0]);
+// 		for (var j in range(size_y)) {
+// 			new_weights[i].push([]);
+// 			for (var k in range(size_x)) {
+// 				new_weights[i][j].push([]);
+// 				if (Math.round(random(0, 0)) == 0)
+// 					new_weights[i][j][k] = parent_a.weights[i][j][k];
+// 				else
+// 					new_weights[i][j][k] = parent_b.weights[i][j][k];
+// 			}
+// 		}
+// 	}
+// 	// TODO: Biases
+// 	// child
+// 	let child = new NeuralNetwork(
+// 		weights = new_weights,
+// 		biases = parent_a.biases,
+// 		layer_sizes = parent_a.layer_sizes,
+// 		layers = []
+// 		);
+// 	child.fitness = undefined;
+// 	return child;
+// }
+// function best_fit_select(model, quantity) {
+// 	let individuals = last_generation(model);
+// 	individuals.sort(function(a, b){
+// 		return b.fitness - a.fitness;
+// 	});
+// 	let selected_individuals = individuals.splice(0, quantity);
+// 	model.generations[len(model.generations) - 1] = selected_individuals;
+// 	return model;
+// }
+// function clone_nn(nn) {
+//     let new_nn = new NeuralNetwork(
+//         weights = nn.weights,
+//         biases = nn.biases,
+//         layer_sizes = nn.layer_sizes,
+//         layers = nn.layers,
+//         non_activated_layers = nn.non_activated_layers);
+function random(min, max) {
+    return Math.random() * (max - min) + min;
+}
+function add(a, b) {
+    return new Vec2(a.x + b.x, a.y + b.y);
+}
+function rad_to_deg(value) {
+    // 1 pi rad = 180 deg
+    // x rad = (180 / pi) * x
+    return value * (180 / Math.PI);
+}
+function deg_to_rad(value) {
+    // 180 deg = 1 pi rad
+    // x deg = (1 pi / 180) * x
+    return (Math.PI / 180) * value;
+}
 // function test_result(value, fail_message) {
 // 	if (value == 1)
 // 		return ".";
@@ -1567,117 +1567,6 @@ function update(time, delta) {
 // class Car {
 // 	addToWorld(world) {
 // 		// car body
-// 		var car_body_shape = new box2d.b2PolygonShape();
-// 		car_body_shape.SetAsBox(23 / SCALE, 50 / SCALE);
-// 		var car_body_fix_def = new box2d.b2FixtureDef();
-// 		car_body_fix_def.shape = car_body_shape;
-// 		car_body_fix_def.density = 10;
-// 		car_body_fix_def.userData = "car";
-// 		var car_body_def = new box2d.b2BodyDef();
-// 		car_body_def.position = new Vec2(180 / SCALE, 300 / SCALE);
-// 		car_body_def.type = box2d.b2Body.b2_dynamicBody;
-// 		car_body_def.linearDamping = 10;
-// 		car_body_def.angularDamping = 10;
-// 		car_body = world.CreateBody(car_body_def);
-// 		car_body.CreateFixture(car_body_fix_def);
-// 		// front axle
-// 		var front_axle_shape = new box2d.b2PolygonShape();
-// 		front_axle_shape.SetAsBox(25 / SCALE, 2 / SCALE);
-// 		var front_axle_fix_def = new box2d.b2FixtureDef();
-// 		front_axle_fix_def.shape = front_axle_shape;
-// 		front_axle_fix_def.density = 1;
-// 		front_axle_fix_def.userData = "car";
-// 		var front_axle_wheel_left_shape = new box2d.b2PolygonShape();
-// 		front_axle_wheel_left_shape.SetAsOrientedBox(
-// 			2 / SCALE,
-// 			10 / SCALE,
-// 			new Vec2(-27 / SCALE, 0 / SCALE)
-// 		);
-// 		var front_axle_wheel_right_shape = new box2d.b2PolygonShape();
-// 		front_axle_wheel_right_shape.SetAsOrientedBox(
-// 			2 / SCALE,
-// 			10 / SCALE,
-// 			new Vec2(27 / SCALE, 0 / SCALE)
-// 		);
-// 		var front_axle_wheel_left_fix_def = new box2d.b2FixtureDef();
-// 		front_axle_wheel_left_fix_def.shape = front_axle_wheel_left_shape;
-// 		front_axle_wheel_left_fix_def.density = 1;
-// 		front_axle_wheel_left_fix_def.userData = "car";
-// 		var front_axle_wheel_right_fix_def = new box2d.b2FixtureDef();
-// 		front_axle_wheel_right_fix_def.shape = front_axle_wheel_right_shape;
-// 		front_axle_wheel_right_fix_def.density = 1;
-// 		front_axle_wheel_right_fix_def.userData = "car";
-// 		var front_axle_def = new box2d.b2BodyDef();
-// 		front_axle_def.position = new Vec2(180 / SCALE, 270 / SCALE);
-// 		front_axle_def.type = box2d.b2Body.b2_dynamicBody;
-// 		front_axle = world.CreateBody(front_axle_def);
-// 		front_axle.CreateFixture(front_axle_fix_def);
-// 		front_axle.CreateFixture(front_axle_wheel_left_fix_def);
-// 		front_axle.CreateFixture(front_axle_wheel_right_fix_def);
-// 		// rear axle
-// 		var rear_axle_shape = new box2d.b2PolygonShape();
-// 		rear_axle_shape.SetAsBox(25 / SCALE, 2 / SCALE);
-// 		var rear_axle_fix_def = new box2d.b2FixtureDef();
-// 		rear_axle_fix_def.shape = rear_axle_shape;
-// 		rear_axle_fix_def.density = 1;
-// 		rear_axle_fix_def.userData = "car";
-// 		var rear_axle_wheel_left_shape = new box2d.b2PolygonShape();
-// 		rear_axle_wheel_left_shape.SetAsOrientedBox(
-// 			2 / SCALE,
-// 			10 / SCALE,
-// 			new Vec2(-27 / SCALE, 0 / SCALE)
-// 		);
-// 		var rear_axle_wheel_right_shape = new box2d.b2PolygonShape();
-// 		rear_axle_wheel_right_shape.SetAsOrientedBox(
-// 			2 / SCALE,
-// 			10 / SCALE,
-// 			new Vec2(27 / SCALE, 0 / SCALE));
-// 		var rear_axle_wheel_left_fix_def = new box2d.b2FixtureDef();
-// 		rear_axle_wheel_left_fix_def.shape = rear_axle_wheel_left_shape;
-// 		rear_axle_wheel_left_fix_def.density = 1;
-// 		rear_axle_wheel_left_fix_def.userData = "car";
-// 		var rear_axle_wheel_right_fix_def = new box2d.b2FixtureDef();
-// 		rear_axle_wheel_right_fix_def.shape = rear_axle_wheel_right_shape;
-// 		rear_axle_wheel_right_fix_def.density = 1;
-// 		rear_axle_wheel_right_fix_def.userData = "car";
-// 		var rear_axle_def = new box2d.b2BodyDef();
-// 		rear_axle_def.position = new Vec2(180 / SCALE, 330 / SCALE);
-// 		rear_axle_def.type = box2d.b2Body.b2_dynamicBody;
-// 		var rear_axle = world.CreateBody(rear_axle_def);
-// 		rear_axle.CreateFixture(rear_axle_fix_def);
-// 		rear_axle.CreateFixture(rear_axle_wheel_left_fix_def);
-// 		rear_axle.CreateFixture(rear_axle_wheel_right_fix_def);
-// 		// front axle and car body joint
-// 		var front_axle_and_car_joint_def = new box2d.b2RevoluteJointDef();
-// 		front_axle_and_car_joint_def.Initialize(
-// 			car_body, front_axle, front_axle.GetPosition());
-// 		front_axle_and_car_joint_def.motorSpeed = 0;
-// 		front_axle_and_car_joint_def.maxMotorTorque = 50;
-// 		front_axle_and_car_joint_def.enableMotor = true;
-// 		front_axle_and_car_joint_def.upperAngle = deg_to_rad(15);
-// 		front_axle_and_car_joint_def.lowerAngle = deg_to_rad(-15);
-// 		front_axle_and_car_joint_def.enableLimit = true;
-// 		front_axle_joint = world.CreateJoint(front_axle_and_car_joint_def);
-// 		// rear axle and car body joint
-// 		var rear_axle_and_car_joint_def = new box2d.b2RevoluteJointDef();
-// 		rear_axle_and_car_joint_def.Initialize(
-// 			car_body, rear_axle, rear_axle.GetPosition());
-// 		rear_axle_and_car_joint_def.motorSpeed = 2;
-// 		rear_axle_and_car_joint_def.maxMotorTorque = 20;
-// 		rear_axle_and_car_joint_def.enableMotor = false;
-// 		rear_axle_and_car_joint_def.upperAngle = deg_to_rad(0);
-// 		rear_axle_and_car_joint_def.lowerAngle = deg_to_rad(0);
-// 		rear_axle_and_car_joint_def.enableLimit = true;
-// 		var rear_axle_joint = world.CreateJoint(rear_axle_and_car_joint_def);
-// 	}
-// 	step() {
-// 	}
-// 	constructor(world) {
-// 		addToWorld(world);
-// 		this.nn = undefined;
-// 		this.fitness = undefined;
-// 	}
-// }
 function clone_road_track_model(model) {
     return {
         h: model.h,
@@ -1706,47 +1595,3 @@ function add_segment(model, position, angle) {
     new_model.relative_position[1] -= new_model.h * 2;
     return new_model;
 }
-// class RoadTrack {
-// 	h: number;
-// 	w: number;
-// 	relative_position: number[];
-// 	scene: Phaser.Scene;
-// 	model: object;
-// 	box2d: 
-// 	constructor(world, model) {
-// 		this.world = world;
-// 		this.model = model;
-// 		this.relative_position = [0, 0];
-// 		this.w = 2;
-// 		this.h = 70;
-// 		this.SCALE = this.model.scale;
-// 		this.box2d = this.model.box2d;
-// 	}
-// 	addSegment(position, angle) {
-// 		this.relative_position[0] += position[0];
-// 		this.relative_position[1] += position[1];
-// 		var segment_def = new box2d.b2BodyDef();
-// 		segment_def.position = new Vec2(
-// 			this.relative_position[0] / this.SCALE,
-// 			this.relative_position[1] / this.SCALE
-// 		);
-// 		segment_def.angle = angle;
-// 		var segment = this.world.CreateBody(segment_def);
-// 		var segment_fix_def = new box2d.b2FixtureDef();
-// 		segment_fix_def.shape = new box2d.b2PolygonShape();
-// 		segment_fix_def.shape.SetAsBox(this.w / this.SCALE, this.h / this.SCALE);
-// 		segment_fix_def.density = 1;
-// 		segment_fix_def.userData = "track";
-// 		segment.CreateFixture(segment_fix_def);
-// 		var rectangle = this.scene.add.rectangle(
-// 			this.relative_position[0],
-// 			this.relative_position[1],
-// 			this.w * 2,
-// 			this.h * 2,
-// 			0x007bff
-// 		);
-// 		rectangle.angle = angle * (180 / Math.PI);
-// 		this.relative_position[0] -= this.w * 2;
-// 		this.relative_position[1] -= this.h * 2;
-// 	}
-// }
