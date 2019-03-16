@@ -45,11 +45,7 @@ function mutate(nn, amount) {
 		}
 	}
 
-	// TODO: biases
-
 	var new_biases = [];
-
-	// console.log(nn);
 
 	for (var i in range(len(nn.biases))) {
 		new_biases.push([[]]);

@@ -19,31 +19,11 @@ var model;
 var ground_width = 700, ground_height = 15;
 var ball_view, car_view;
 var cursors;
-// var left_sensor_intersections = 0,
-// 	right_sensor_intersections = 0,
-// 	center_sensor_intersections = 0;
 
 var world, ball, ground, car_body, front_axle, rear_axle, right_sensor;
 
 var current_individual_index = [0, 0];
 var starting_time;
-
-function add(a, b) {
-	return new Vec2(a.x + b.x, a.y + b.y);
-}
-
-function rad_to_deg(value) {
-	// 1 pi rad = 180 deg
-	// x rad = (180 / pi) * x
-
-	return value * (180 / Math.PI);
-}
-
-function deg_to_rad(value) {
-	// 180 deg = 1 pi rad
-	// x deg = (1 pi / 180) * x
-	return (Math.PI / 180) * value;
-}
 
 function preload ()
 {
@@ -58,17 +38,16 @@ function preload ()
 
 	// neural network
 
-	if (model === undefined)
-		setup_neural_network();
+	// if (model === undefined)
+	// 	setup_neural_network();
+	model = {
+		cars: []
+	};
 }
 
 function create ()
 {
 	starting_time = this.time.now;
-
-	left_sensor_intersections = 0;
-	center_sensor_intersections = 0;
-	right_sensor_intersections = 0;
 
 	distance_text = this.add.text(5, 20, "Distance: 0");
 	speed_text = this.add.text(5, 50, "Speed: 0");

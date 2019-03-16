@@ -96,3 +96,20 @@ function generate_weights_and_biases_from_objects(
 function random(min, max) {
     return Math.random() * (max - min) + min;
 }
+
+function add(a, b) {
+    return new Vec2(a.x + b.x, a.y + b.y);
+}
+
+function rad_to_deg(value) {
+    // 1 pi rad = 180 deg
+    // x rad = (180 / pi) * x
+
+    return value * (180 / Math.PI);
+}
+
+function deg_to_rad(value) {
+    // 180 deg = 1 pi rad
+    // x deg = (1 pi / 180) * x
+    return (Math.PI / 180) * value;
+}
