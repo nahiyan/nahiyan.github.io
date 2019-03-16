@@ -1,3 +1,3 @@
 #!/bin/bash
 
-tsc src/*.ts --outFile js/neurolution.js
+tsc src/libs/*/*.ts src/classes/*.ts --outFile js/neurolution.js
