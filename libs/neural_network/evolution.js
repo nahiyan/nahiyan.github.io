@@ -16,16 +16,12 @@ class Evolution {
     }
 }
 
-function random(min, max) {
-	return Math.random() * (max - min + 1) + min;
-}
-
 // randomly mutate the weights and biases of a NN based on the amount
 
 function mutate(nn, amount) {
 	// weights
 
-	new_weights = [];
+	var new_weights = [];
 
 	// i -> matrix representing weights between 2 layers
 
@@ -51,9 +47,29 @@ function mutate(nn, amount) {
 
 	// TODO: biases
 
+	var new_biases = [];
+
+	// console.log(nn);
+
+	for (var i in range(len(nn.biases))) {
+		new_biases.push([[]]);
+
+		let size = len(nn.biases[i][0]);
+
+		for (var j in range(size)) {
+			let random_variation = nn.biases[i][0][j] * amount;
+			let r = random(-random_variation, random_variation);
+
+			new_biases[i][0].push(nn.biases[i][0][j] + r);
+		}
+	}
+
 	let new_nn = clone_nn(nn);
 
 	new_nn.weights = new_weights;
+	new_nn.biases = new_biases;
+
+	console.log(new_nn);
 
 	return new_nn;
 }
@@ -86,8 +102,8 @@ function last_generation(model) {
 }
 
 function new_generation(model) {
-	let selection_count = 4;
-	let mutation_rate = 50;
+	let selection_count = 6;
+	let mutation_rate = 0.2;
 
 	// natural selection
 
@@ -116,7 +132,7 @@ function new_generation(model) {
 	// mutate the neural networks
 
 	for (var i = 0; i < len(lg); i++) {
-		model.generations[len(model.generations) - 1][i] = mutate(model.generations[len(model.generations) - 1][i], mutation_rate / 100);
+		model.generations[len(model.generations) - 1][i] = mutate(model.generations[len(model.generations) - 1][i], mutation_rate);
 	}
 
 	return model;

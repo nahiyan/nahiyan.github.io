@@ -47,7 +47,7 @@ function setup_physics(scene) {
 	car_body_fix_def.userData = "car";
 
 	var car_body_def = new box2d.b2BodyDef();
-	car_body_def.position = new Vec2(200 / SCALE, 300 / SCALE);
+	car_body_def.position = new Vec2(180 / SCALE, 300 / SCALE);
 	car_body_def.type = box2d.b2Body.b2_dynamicBody;
 	car_body_def.linearDamping = 10;
 	car_body_def.angularDamping = 10;
@@ -90,7 +90,7 @@ function setup_physics(scene) {
 	front_axle_wheel_right_fix_def.userData = "car";
 
 	var front_axle_def = new box2d.b2BodyDef();
-	front_axle_def.position = new Vec2(200 / SCALE, 270 / SCALE);
+	front_axle_def.position = new Vec2(180 / SCALE, 270 / SCALE);
 	front_axle_def.type = box2d.b2Body.b2_dynamicBody;
 
 	front_axle = world.CreateBody(front_axle_def);
@@ -132,7 +132,7 @@ function setup_physics(scene) {
 	rear_axle_wheel_right_fix_def.userData = "car";
 
 	var rear_axle_def = new box2d.b2BodyDef();
-	rear_axle_def.position = new Vec2(200 / SCALE, 330 / SCALE);
+	rear_axle_def.position = new Vec2(180 / SCALE, 330 / SCALE);
 	rear_axle_def.type = box2d.b2Body.b2_dynamicBody;
 
 	var rear_axle = world.CreateBody(rear_axle_def);
@@ -147,7 +147,7 @@ function setup_physics(scene) {
 	front_axle_and_car_joint_def.Initialize(
 		car_body, front_axle, front_axle.GetPosition());
 
-	front_axle_and_car_joint_def.motorSpeed = 5;
+	front_axle_and_car_joint_def.motorSpeed = 0;
 	front_axle_and_car_joint_def.maxMotorTorque = 50;
 	front_axle_and_car_joint_def.enableMotor = true;
 	front_axle_and_car_joint_def.upperAngle = deg_to_rad(15);

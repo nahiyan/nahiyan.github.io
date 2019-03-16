@@ -92,3 +92,7 @@ function generate_weights_and_biases_from_objects(
 
     return [weights, biases];
 }
+
+function random(min, max) {
+    return Math.random() * (max - min) + min;
+}

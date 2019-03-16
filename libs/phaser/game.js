@@ -458,20 +458,21 @@ function update (time, delta)
 	var output_non_activated =
 		last_non_activated_layer(
 			forward_propagate(current_individual));
-		
-	var steering = 0;
-	var acceleration = 1;
 
-	if (output[0][0] - output[0][1] >= 0.01) {
-		steering = -1;
-		// steering_text.setText("Steering: Left");
-	} else if (output[0][1] - output[0][0] >= 0.01) {
-		steering = 1;
-		// steering_text.setText("Steering: Right");
-	}
+	steering = (0.8 - output_non_activated[0][1]);
 
-	steering_text.setText("Steering: " + Math.round(output[0][0] * 100) / 100 + ", " + Math.round(output[0][1] * 100) / 100);
-	
+	// var steering = 0;
+	// var acceleration = 1;
+
+	// if (output[0][0] - output[0][1] >= 0.01) {
+	// 	steering = -1;
+	// 	// steering_text.setText("Steering: Left");
+	// } else if (output[0][1] - output[0][0] >= 0.01) {
+	// 	steering = 1;
+	// 	// steering_text.setText("Steering: Right");
+	// }
+
+	steering_text.setText("Output: " + Math.round(output[0][0] * 100) / 100 + ", " + Math.round(steering * 100) / 100);
 	steering_text.setPosition(this.cameras.main.scrollX + 5, this.cameras.main.scrollY + 130);
 
 	// if (output[0][2] >= 0.5)
@@ -511,44 +512,52 @@ function update (time, delta)
 
 	acceration_force = 30;
 
-	if (cursors.up.isDown || acceleration == 1) {
-		front_axle.ApplyForce(
-			new Vec2(
-				Math.sin(front_axle.GetAngle()) * acceration_force,
-				-Math.cos(front_axle.GetAngle()) * acceration_force
-			),
-			front_axle.GetWorldCenter()
-		);
-	} else if (cursors.down.isDown) {
-		front_axle.ApplyForce(
-			new Vec2(
-				-Math.sin(front_axle.GetAngle()) * acceration_force,
-				Math.cos(front_axle.GetAngle()) * acceration_force
-			),
-			front_axle.GetWorldCenter()
-		);
-	} else {
+	// if (cursors.up.isDown) {
+	// 	front_axle.ApplyForce(
+	// 		new Vec2(
+	// 			Math.sin(front_axle.GetAngle()) * acceration_force,
+	// 			-Math.cos(front_axle.GetAngle()) * acceration_force
+	// 		),
+	// 		front_axle.GetWorldCenter()
+	// 	);
+	// } else if (cursors.down.isDown) {
+	// 	front_axle.ApplyForce(
+	// 		new Vec2(
+	// 			-Math.sin(front_axle.GetAngle()) * acceration_force,
+	// 			Math.cos(front_axle.GetAngle()) * acceration_force
+	// 		),
+	// 		front_axle.GetWorldCenter()
+	// 	);
+	// } else {
 		
-	}
+	// }
+
+	front_axle.ApplyForce(
+			new Vec2(
+				Math.sin(front_axle.GetAngle()) * output[0][0] * acceration_force,
+				-Math.cos(front_axle.GetAngle()) * output[0][0] * acceration_force
+			),
+			front_axle.GetWorldCenter()
+		);
 
 	// steering
 
 	torque = 0.3;
 
-	if (cursors.left.isDown || steering == -1) {
-		front_axle_joint.SetMotorSpeed(-torque);
-	} else if (cursors.right.isDown || steering == 1) {
-		front_axle_joint.SetMotorSpeed(torque);
-	} else {
-		if (front_axle_joint.GetJointAngle() != 0) {
-			if (front_axle_joint.GetJointAngle() > 0)
-				front_axle_joint.SetMotorSpeed(-torque);
-			else
-				front_axle_joint.SetMotorSpeed(torque);
-		}
-	}
+	// if (cursors.left.isDown) {
+	// 	front_axle_joint.SetMotorSpeed(-torque);
+	// } else if (cursors.right.isDown) {
+	// 	front_axle_joint.SetMotorSpeed(torque);
+	// } else if (output_non_activated[0][1] == 0) {
+	// 	if (front_axle_joint.GetJointAngle() != 0) {
+	// 		if (front_axle_joint.GetJointAngle() > 0)
+	// 			front_axle_joint.SetMotorSpeed(-torque);
+	// 		else
+	// 			front_axle_joint.SetMotorSpeed(torque);
+	// 	}
+	// }
 
-	// console.log(speed);
+	front_axle_joint.SetMotorSpeed(steering);
 }
 
 function gameover(scene, time) {
