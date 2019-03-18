@@ -3,6 +3,7 @@ interface RoadTrackModel {
 	w: number;
 	relative_position: number[];
 	scene: any;
+	world: any;
 }
 
 function clone_road_track_model(model: RoadTrackModel): RoadTrackModel {
@@ -10,7 +11,8 @@ function clone_road_track_model(model: RoadTrackModel): RoadTrackModel {
 		h: model.h,
 		w: model.w,
 		relative_position: model.relative_position,
-		scene: model.scene
+		scene: model.scene,
+		world: model.world
 	};
 }
 
@@ -27,7 +29,7 @@ function add_road_track_segment(model: RoadTrackModel, position: number[], angle
 	);
 	segment_def.angle = angle;
 
-	var segment = world.CreateBody(segment_def);
+	var segment = model.world.CreateBody(segment_def);
 
 	var segment_fix_def = new box2d.b2FixtureDef();
 	segment_fix_def.shape = new box2d.b2PolygonShape();

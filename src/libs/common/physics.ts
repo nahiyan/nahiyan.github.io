@@ -1,9 +1,7 @@
-let world: any;
-
-function setup_physics(scene: any) {
+function prepare_world(scene: any): any {
 	// world
 
-	world = new box2d.b2World(new Vec2(0, 0), true);
+	let world: any = new box2d.b2World(new Vec2(0, 0), true);
 
 	// ball
 
@@ -66,7 +64,8 @@ function setup_physics(scene: any) {
 		h: 70,
 		w: 2,
 		relative_position: [0, 0],
-		scene: scene
+		scene: scene,
+		world: world
 	}
 
 	road_tracks_left = add_road_track_segment(road_tracks_left, [100, 415], deg_to_rad(0));
@@ -89,7 +88,8 @@ function setup_physics(scene: any) {
 		h: 70,
 		w: 2,
 		relative_position: [0, 0],
-		scene: scene
+		scene: scene,
+		world: world
 	}
 
 	road_tracks_right = add_road_track_segment(road_tracks_right, [270, 415], deg_to_rad(0));
@@ -106,4 +106,6 @@ function setup_physics(scene: any) {
 	road_tracks_right = add_road_track_segment(road_tracks_right, [28, 7], deg_to_rad(20));
 	road_tracks_right = add_road_track_segment(road_tracks_right, [73, 21], deg_to_rad(40));
 	road_tracks_right = add_road_track_segment(road_tracks_right, [105, 47], deg_to_rad(55));
+
+	return world;
 }

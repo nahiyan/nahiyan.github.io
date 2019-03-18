@@ -1,15 +1,32 @@
-// function clone_nn(nn) {
-//     let new_nn = new NeuralNetwork(
-//         weights = nn.weights,
-//         biases = nn.biases,
-//         layer_sizes = nn.layer_sizes,
-//         layers = nn.layers,
-//         non_activated_layers = nn.non_activated_layers);
+function clone_nnm(nn: NeuralNetworkModel): NeuralNetworkModel {
+    return {
+	    weights: nn.weights,
+	    biases: nn.biases,
+	    layer_sizes: nn.layer_sizes,
+	    layers: nn.layers,
+	    non_activated_layers: nn.non_activated_layers,
+        identity_biases: nn.identity_biases
+	};
+}
 
-//     new_nn.fitness = nn.fitness;
+function clone_sm(model: SimulationModel): SimulationModel {
+    return {
+        generations: model.generations,
+        current_generation_index: model.current_generation_index,
+        population_size: model.population_size,
+        layer_sizes: model.layer_sizes,
+        world: model.world,
+        scene: model.scene
+    };
+}
 
-//     return new_nn;
-// }
+function range(size: number, startAt: number = 0): number[] {
+    return [...Array(size).keys()].map(i => i + startAt);
+}
+
+function len(array): number {
+    return array.length;
+}
 
 // function clone_model(model) {
 //     let new_model = new Evolution(

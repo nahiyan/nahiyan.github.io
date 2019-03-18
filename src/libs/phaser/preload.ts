@@ -1,18 +1,17 @@
 function preload() {
-// 	// images
+	// images
 
-// 	this.load.image('car', 'assets/car.png');
-// 	this.load.image('ball', 'assets/ball.png');
+	this.load.image('car', 'assets/car.png');
+	this.load.image('ball', 'assets/ball.png');
 
-// 	// physics - box2d
+	// create the simulation model
 
-// 	setup_physics(this);
-
-// 	// neural network
-
-// 	// if (model === undefined)
-// 	// 	setup_neural_network();
-// 	model = {
-// 		cars: []
-// 	};
+	sm = {
+	    generations: [],
+	    current_generation_index: 0,
+	    population_size: 10,
+	    layer_sizes: [3, 5, 3, 2],
+	    world: prepare_world(this),
+	    scene: this
+	};
 }
