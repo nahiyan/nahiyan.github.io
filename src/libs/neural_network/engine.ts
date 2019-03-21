@@ -136,7 +136,7 @@ function number_of_input_layers(model: NeuralNetworkModel): number {
 // get output layer from input layer
 function output_layer(input_layer: any, model: NeuralNetworkModel): any {
     let new_model: NeuralNetworkModel = clone_nnm(model);
-    new_model.layers = [input_layer];
+    new_model.layers = [ input_layer ];
 
     return last_layer(
         forward_propagate(new_model));
@@ -151,7 +151,7 @@ function output_layer(input_layer: any, model: NeuralNetworkModel): any {
 
 
 // forward propagation to a new layer of index i based on the previous layer
-function forward_propagate_step(i: number, model: NeuralNetworkModel): any {
+function forward_propagate_step(i: number, model: NeuralNetworkModel): NeuralNetworkModel {
     var output_layer_index = number_of_layers(model) - 1;
     var previous_layer = layer(i - 1, model);
 
@@ -166,7 +166,7 @@ function forward_propagate_step(i: number, model: NeuralNetworkModel): any {
     var new_layer = activate(
         non_activated_new_layer);
 
-    var new_model = model;
+    var new_model = clone_nnm(model);
     new_model.layers.push(
         new_layer);
     new_model.non_activated_layers.push(
@@ -179,14 +179,13 @@ function forward_propagate_step(i: number, model: NeuralNetworkModel): any {
 }
 
 
-function forward_propagate(model: NeuralNetworkModel): any {
-    var new_model = model;
+function forward_propagate(model: NeuralNetworkModel): NeuralNetworkModel {
+    var new_model = clone_nnm(model);
     new_model.layers = [ model.layers[0] ];
     new_model.non_activated_layers = [];
 
-    if (model.identity_biases == undefined) {
-        new_model.identity_biases = identity(1, number_of_input_layers(model));
-    }
+    if (new_model.identity_biases === undefined)
+        new_model.identity_biases = identity(1, number_of_input_layers(new_model));
 
     return forward_propagate_step(1, new_model);
 }

@@ -3,39 +3,6 @@ function prepare_world(scene: any): any {
 
 	let world: any = new box2d.b2World(new Vec2(0, 0), true);
 
-	// ball
-
-	var ball_body_def = new box2d.b2BodyDef();
-	ball_body_def.type = box2d.b2Body.b2_dynamicBody;
-	ball_body_def.position = new Vec2(300 / SCALE, 200 / SCALE);
-
-	var ball_shape = new box2d.b2CircleShape(16 / SCALE);
-
-	var ball_fix_def = new box2d.b2FixtureDef();
-	ball_fix_def.density = 5;
-	ball_fix_def.friction = 0.5;
-	ball_fix_def.shape = ball_shape;
-	ball_fix_def.restitution = 0.3;
-	ball_fix_def.linearDamping = 10;
-
-	var ball = world.CreateBody(ball_body_def);
-	ball.CreateFixture(ball_fix_def);
-
-	// ground
-
-	// var ground_body_def = new box2d.b2BodyDef();
-	// ground_body_def.type = box2d.b2Body.b2_staticBody;
-	// ground_body_def.position = new Vec2(250 / SCALE, 490 / SCALE);
-
-	// var ground_shape = new box2d.b2PolygonShape();
-	// ground_shape.SetAsBox((ground_width / 2) / SCALE, (ground_height / 2) / SCALE);
-
-	// var ground_fix_def = new box2d.b2FixtureDef();
-	// ground_fix_def.shape = ground_shape;
-
-	// var ground = world.CreateBody(ground_body_def);
-	// ground.CreateFixture(ground_fix_def);
-
 	// debug draw
 
 	var debug_draw = new box2d.b2DebugDraw();
@@ -48,8 +15,19 @@ function prepare_world(scene: any): any {
 
 	var contact_listener = new box2d.b2ContactListener();
 	contact_listener.BeginContact = function(c) {
-		if (c.GetFixtureA().GetUserData() == "car" && c.GetFixtureB().GetUserData() == "track")
-			gameover(scene, scene.time.now());
+		const a: any = JSON.parse(c.GetFixtureA().GetUserData());
+		const b: any = JSON.parse(c.GetFixtureB().GetUserData());
+
+		if (a["type"] == "car" && b["type"] == "track") {
+			const car: Car = sm.generations[a["generation_index"]].cars[a["car_index"]];
+
+			// console.log(a["generation_index"], a["car_index"]);
+
+			mark_car_for_destruction(car);
+		}
+
+		// if ()
+		// 	remove_car_from_world(sm, c);
 	};
 
 	// contact_listener.EndContact = function(c) {

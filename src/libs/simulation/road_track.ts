@@ -35,7 +35,9 @@ function add_road_track_segment(model: RoadTrackModel, position: number[], angle
 	segment_fix_def.shape = new box2d.b2PolygonShape();
 	segment_fix_def.shape.SetAsBox(new_model.w / SCALE, new_model.h / SCALE);
 	segment_fix_def.density = 1;
-	segment_fix_def.userData = "track";
+	segment_fix_def.userData = '{ "type": "track" }';
+	segment_fix_def.filter.categoryBits = category.track;
+	segment_fix_def.filter.maskBits = mask.track;
 
 	segment.CreateFixture(segment_fix_def);
 

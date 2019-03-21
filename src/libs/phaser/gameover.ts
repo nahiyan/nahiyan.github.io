@@ -1,5 +1,5 @@
-function gameover(scene: any, time:number) {
-// 	scene.scene.restart();
+function gameover(scene: any, time:number): void {
+	scene.scene.restart();
 
 // 	let average_speed = total_distance / ((scene.time.now - starting_time) / 1000);
 // 	let fitness_value = total_distance * average_speed;

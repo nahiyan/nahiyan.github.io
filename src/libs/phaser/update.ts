@@ -1,4 +1,23 @@
 function update (time, delta) {
+	// process destruction queue
+
+	if (len(dq.queue) != 0) {
+		dq.queue.forEach(function(car: Car) {
+			remove_car_from_world(sm, car);
+		});
+		dq.queue = [];
+	}
+
+	sm.world.Step(1 / 30, delta, delta);
+	sm.world.DrawDebugData();
+	sm.world.ClearForces();
+
+	let lg: Generation = last_generation(sm);
+
+	lg.cars.forEach(function(car: Car) {
+		step_car(sm, car, delta);
+	});
+
 // 	lsv = 0, csv = 0, rsv = 0;
 
 // 	let ray_left_p1 =
@@ -122,7 +141,7 @@ function update (time, delta) {
 	
 // 	// camera
 
-// 	this.cameras.main.setScroll(car_body.GetPosition().x * SCALE - 300, car_body.GetPosition().y * SCALE - 300);
+	// this.cameras.main.setScroll(car_body.GetPosition().x * SCALE - 300, car_body.GetPosition().y * SCALE - 300);
 
 // 	// keep text position fixed
 

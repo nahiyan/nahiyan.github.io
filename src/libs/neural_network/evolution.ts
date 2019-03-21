@@ -58,12 +58,12 @@ function initialize_evolution(model: SimulationModel): SimulationModel {
 		cars: []
 	};
 
+	new_model.generations.push(first_gen);
+
 	// populate the generation
 	for (var i in range(model.population_size)) {
 		first_gen.cars.push(create_car(model));
 	}
-
-	new_model.generations.push(first_gen);
 
 	return new_model;
 }

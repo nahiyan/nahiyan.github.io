@@ -1,12 +1,41 @@
 interface Car {
 	nn: NeuralNetworkModel;
 	fitness?: number;
-	car_body: any;
-	front_axle: any;
-	rear_axle: any;
+
+	previous_position?: number[];
+	total_distance?: number;
+
+	// box2d world
+	car_body?: any;
+	front_axle?: any;
+	rear_axle?: any;
+	front_axle_joint?: any;
+
+	// phaser scene
+	car_container?: any;
+	front_axle_view?: any;
+	rear_axle_view?: any;
+
+	ray_right_view?: any;
+	ray_left_view?: any;
+	ray_center_view?: any;
+
+	// sensors
+	lsv: number;
+	csv: number;
+	rsv: number;
+
+	left_sensor_top_view?: any;
+	left_sensor_bottom_view?: any;
+	center_sensor_top_view?: any;
+	center_sensor_bottom_view?: any;
+	right_sensor_top_view?: any;
+	right_sensor_bottom_view?: any;
+
+	user_data: string;
 }
 
-function add_car_to_world(model: SimulationModel): void {
+function add_car_to_world(model: SimulationModel, car: Car): void {
 	// car body
 
 	let car_body_shape: any = new box2d.b2PolygonShape();
@@ -15,7 +44,9 @@ function add_car_to_world(model: SimulationModel): void {
 	let car_body_fix_def: any = new box2d.b2FixtureDef();
 	car_body_fix_def.shape = car_body_shape;
 	car_body_fix_def.density = 10;
-	car_body_fix_def.userData = "car";
+	car_body_fix_def.userData = car.user_data;
+	car_body_fix_def.filter.categoryBits = category.car;
+	car_body_fix_def.filter.maskBits = mask.car;
 
 	let car_body_def: any = new box2d.b2BodyDef();
 	car_body_def.position = new Vec2(180 / SCALE, 300 / SCALE);
@@ -34,7 +65,9 @@ function add_car_to_world(model: SimulationModel): void {
 	let front_axle_fix_def: any = new box2d.b2FixtureDef();
 	front_axle_fix_def.shape = front_axle_shape;
 	front_axle_fix_def.density = 1;
-	front_axle_fix_def.userData = "car";
+	front_axle_fix_def.userData = car.user_data;
+	front_axle_fix_def.filter.categoryBits = category.car;
+	front_axle_fix_def.filter.maskBits = mask.car;
 
 	let front_axle_wheel_left_shape: any = new box2d.b2PolygonShape();
 	front_axle_wheel_left_shape.SetAsOrientedBox(
@@ -53,12 +86,16 @@ function add_car_to_world(model: SimulationModel): void {
 	let front_axle_wheel_left_fix_def: any = new box2d.b2FixtureDef();
 	front_axle_wheel_left_fix_def.shape = front_axle_wheel_left_shape;
 	front_axle_wheel_left_fix_def.density = 1;
-	front_axle_wheel_left_fix_def.userData = "car";
+	front_axle_wheel_left_fix_def.userData = car.user_data;
+	front_axle_wheel_left_fix_def.filter.categoryBits = category.car;
+	front_axle_wheel_left_fix_def.filter.maskBits = mask.car;
 
 	let front_axle_wheel_right_fix_def: any = new box2d.b2FixtureDef();
 	front_axle_wheel_right_fix_def.shape = front_axle_wheel_right_shape;
 	front_axle_wheel_right_fix_def.density = 1;
-	front_axle_wheel_right_fix_def.userData = "car";
+	front_axle_wheel_right_fix_def.userData = car.user_data;
+	front_axle_wheel_right_fix_def.filter.categoryBits = category.car;
+	front_axle_wheel_right_fix_def.filter.maskBits = mask.car;
 
 	let front_axle_def: any = new box2d.b2BodyDef();
 	front_axle_def.position = new Vec2(180 / SCALE, 270 / SCALE);
@@ -77,7 +114,9 @@ function add_car_to_world(model: SimulationModel): void {
 	let rear_axle_fix_def: any = new box2d.b2FixtureDef();
 	rear_axle_fix_def.shape = rear_axle_shape;
 	rear_axle_fix_def.density = 1;
-	rear_axle_fix_def.userData = "car";
+	rear_axle_fix_def.userData = car.user_data;
+	rear_axle_fix_def.filter.categoryBits = category.car;
+	rear_axle_fix_def.filter.maskBits = mask.car;
 
 	let rear_axle_wheel_left_shape: any = new box2d.b2PolygonShape();
 	rear_axle_wheel_left_shape.SetAsOrientedBox(
@@ -95,12 +134,16 @@ function add_car_to_world(model: SimulationModel): void {
 	let rear_axle_wheel_left_fix_def: any = new box2d.b2FixtureDef();
 	rear_axle_wheel_left_fix_def.shape = rear_axle_wheel_left_shape;
 	rear_axle_wheel_left_fix_def.density = 1;
-	rear_axle_wheel_left_fix_def.userData = "car";
+	rear_axle_wheel_left_fix_def.userData = car.user_data;
+	rear_axle_wheel_left_fix_def.filter.categoryBits = category.car;
+	rear_axle_wheel_left_fix_def.filter.maskBits = mask.car;
 
 	let rear_axle_wheel_right_fix_def: any = new box2d.b2FixtureDef();
 	rear_axle_wheel_right_fix_def.shape = rear_axle_wheel_right_shape;
 	rear_axle_wheel_right_fix_def.density = 1;
-	rear_axle_wheel_right_fix_def.userData = "car";
+	rear_axle_wheel_right_fix_def.userData = car.user_data;
+	rear_axle_wheel_right_fix_def.filter.categoryBits = category.car;
+	rear_axle_wheel_right_fix_def.filter.maskBits = mask.car;
 
 	let rear_axle_def: any = new box2d.b2BodyDef();
 	rear_axle_def.position = new Vec2(180 / SCALE, 330 / SCALE);
@@ -140,27 +183,20 @@ function add_car_to_world(model: SimulationModel): void {
 	rear_axle_and_car_joint_def.enableLimit = true;
 
 	var rear_axle_joint = model.world.CreateJoint(rear_axle_and_car_joint_def);
+
+	car.car_body = car_body;
+	car.front_axle = front_axle;
+	car.rear_axle = rear_axle;
+	car.front_axle_joint = front_axle_joint;
 }
 
-function add_car_to_scene(model: SimulationModel): void {
+function add_car_to_scene(model: SimulationModel, car: Car): void {
 	// views
 
-	let car: any = model.scene.add.container(
+	let car_container: any = model.scene.add.container(
 		200,
 		300
 	);
-
-	let ball_view: any = model.scene.add.sprite(200, 300, 'ball').setScale(0.5);
-
-	// frontl_wheel_view = new Phaser.GameObjects.Rectangle(this, -25, -30, 5, 20, 0x00ff00);
-	// frontr_wheel_view = new Phaser.GameObjects.Rectangle(this, 25, -30, 5, 20, 0x00ff00);
-	// rearr_wheel_view = new Phaser.GameObjects.Rectangle(this, 25, 30, 5, 20, 0x00ff00);
-	// rearl_wheel_view = new Phaser.GameObjects.Rectangle(this, -25, 30, 5, 20, 0x00ff00);
-
-	// car.add(frontl_wheel_view);
-	// car.add(frontr_wheel_view);
-	// car.add(rearr_wheel_view);
-	// car.add(rearl_wheel_view);
 
 	let front_axle_view: any = model.scene.add.container(
 		0,
@@ -197,7 +233,7 @@ function add_car_to_scene(model: SimulationModel): void {
 			0x00ff00
 			));
 
-	car.add(front_axle_view);
+	car_container.add(front_axle_view);
 
 	let rear_axle_view: any = model.scene.add.container(
 		0,
@@ -234,53 +270,12 @@ function add_car_to_scene(model: SimulationModel): void {
 			0x00ff00
 			));
 
-	// rear_axle_view.setDepth(100);
-
-	car.add(rear_axle_view);
-
-	let right_sensor_view: any = new Phaser.GameObjects.Rectangle(
-		model.scene,
-		45,
-		-93,
-		3,
-		100,
-		0x00ff00
-	);
-	right_sensor_view.setDepth(-1);
-	right_sensor_view.setAlpha(0.7);
-	right_sensor_view.setAngle(32);
-
-	let left_sensor_view: any = new Phaser.GameObjects.Rectangle(
-		model.scene,
-		-45,
-		-93,
-		3,
-		100,
-		0x00ff00
-	);
-	left_sensor_view.setDepth(-1);
-	left_sensor_view.setAlpha(0.7);
-	left_sensor_view.setAngle(-32);
-
-	let center_sensor_view: any = new Phaser.GameObjects.Rectangle(
-		model.scene,
-		0,
-		-112,
-		3,
-		117,
-		0x00ff00
-	);
-	center_sensor_view.setDepth(-1);
-	center_sensor_view.setAlpha(0.7);
-
-	// let ground_view: any = model.scene.add.rectangle(200, 300, ground_width, ground_height, 0x007bff);
-	// ground_view.x = ground.GetWorldCenter().x * SCALE;
-	// ground_view.y = ground.GetWorldCenter().y * SCALE;
+	car_container.add(rear_axle_view);
 
 	let car_view: any = new Phaser.GameObjects.Image(model.scene, 0, 0, 'car');
 	car_view.setScale(0.5);
 
-	car.add(car_view);
+	car_container.add(car_view);
 
 	let ray_left_view: any = model.scene.add.line(0, 0, 0, 0, 0, 0, 0xffffff);
 	let ray_right_view: any = model.scene.add.line(0, 0, 0, 0, 0, 0, 0xffffff);
@@ -295,7 +290,7 @@ function add_car_to_scene(model: SimulationModel): void {
 		0x0000ff
 	);
 	left_sensor_bottom_view.setAngle(-32);
-	car.add(left_sensor_bottom_view);
+	car_container.add(left_sensor_bottom_view);
 
 	let left_sensor_top_view: any = new Phaser.GameObjects.Rectangle(
 		model.scene,
@@ -306,7 +301,7 @@ function add_car_to_scene(model: SimulationModel): void {
 		0x0000ff
 	);
 	left_sensor_top_view.setAngle(-32);
-	car.add(left_sensor_top_view);
+	car_container.add(left_sensor_top_view);
 
 	let right_sensor_bottom_view: any = new Phaser.GameObjects.Rectangle(
 		model.scene,
@@ -317,7 +312,7 @@ function add_car_to_scene(model: SimulationModel): void {
 		0x0000ff
 	);
 	right_sensor_bottom_view.setAngle(32);
-	car.add(right_sensor_bottom_view);
+	car_container.add(right_sensor_bottom_view);
 	
 
 	let right_sensor_top_view: any = new Phaser.GameObjects.Rectangle(
@@ -329,7 +324,7 @@ function add_car_to_scene(model: SimulationModel): void {
 		0x0000ff
 	);
 	right_sensor_top_view.setAngle(32);
-	car.add(right_sensor_top_view);
+	car_container.add(right_sensor_top_view);
 
 	let center_sensor_bottom_view: any = new Phaser.GameObjects.Rectangle(
 		model.scene,
@@ -340,7 +335,7 @@ function add_car_to_scene(model: SimulationModel): void {
 		0x0000ff
 	);
 	center_sensor_bottom_view.setAngle(0);
-	car.add(center_sensor_bottom_view);
+	car_container.add(center_sensor_bottom_view);
 	
 
 	let center_sensor_top_view: any = new Phaser.GameObjects.Rectangle(
@@ -352,31 +347,253 @@ function add_car_to_scene(model: SimulationModel): void {
 		0x0000ff
 	);
 	center_sensor_top_view.setAngle(0);
-	car.add(center_sensor_top_view);
+	car_container.add(center_sensor_top_view);
+
+	car.car_container = car_container;
+	car.front_axle_view = front_axle_view;
+	car.rear_axle_view = rear_axle_view;
+
+	car.ray_left_view = ray_left_view;
+	car.ray_center_view = ray_center_view;
+	car.ray_right_view = ray_right_view;
+
+	car.previous_position = [car_container.x, car_container.y];
+	car.total_distance = 0;
+
+	car.left_sensor_bottom_view = left_sensor_bottom_view;
+	car.left_sensor_top_view = left_sensor_top_view;
+	car.center_sensor_bottom_view = center_sensor_bottom_view;
+	car.center_sensor_top_view = center_sensor_top_view;
+	car.right_sensor_bottom_view = right_sensor_bottom_view;
+	car.right_sensor_top_view = right_sensor_top_view;
 }
 
+// @functional
 // create bodies, joints, views and add them to the world, and the model.scene
 function create_car(model: SimulationModel): Car {
-	let previous_position: number[] = [car.x, car.y];
-	let total_distance: number = 0;
-
 	return {
 		nn: {
 			weights: random_weights(model.layer_sizes),
-			biases: random_weights(model.layer_sizes),
+			biases: random_biases(model.layer_sizes),
 			layer_sizes: model.layer_sizes,
 			layers: [],
 			non_activated_layers: [],
-			identity_biases: []
+			identity_biases: undefined
 		},
-		fitness: undefined,
-		car_body: car_body,
-		front_axle: front_axle,
-		rear_axle: rear_axle
+		lsv: 0,
+		csv: 0,
+		rsv: 0,
+		user_data:
+			'{ "type": "car", "generation_index": '
+			+ (len(model.generations) - 1)
+			+ ', "car_index": '
+			+ len(model.generations[(len(model.generations) - 1)].cars) + ' }'
 	};
 }
 
-function step_car(car:Car): Car {
+function step_car(model: SimulationModel, car: Car, delta: number): Car {
+	car.lsv, car.csv, car.rsv = 0, 0, 0;
+
+	let ray_left_p1 =
+		new Vec2(
+			(car.left_sensor_bottom_view.getWorldTransformMatrix().e) / SCALE,
+			(car.left_sensor_bottom_view.getWorldTransformMatrix().f) / SCALE);
+	let ray_left_p2 =
+		new Vec2(
+			(car.left_sensor_top_view.getWorldTransformMatrix().e) / SCALE,
+			(car.left_sensor_top_view.getWorldTransformMatrix().f) / SCALE);
+
+	let ray_right_p1 =
+		new Vec2(
+			(car.right_sensor_bottom_view.getWorldTransformMatrix().e) / SCALE,
+			(car.right_sensor_bottom_view.getWorldTransformMatrix().f) / SCALE);
+	let ray_right_p2 =
+		new Vec2(
+			(car.right_sensor_top_view.getWorldTransformMatrix().e) / SCALE,
+			(car.right_sensor_top_view.getWorldTransformMatrix().f) / SCALE);
+
+	let ray_center_p1 =
+		new Vec2(
+			(car.center_sensor_bottom_view.getWorldTransformMatrix().e) / SCALE,
+			(car.center_sensor_bottom_view.getWorldTransformMatrix().f) / SCALE);
+	let ray_center_p2 =
+		new Vec2(
+			(car.center_sensor_top_view.getWorldTransformMatrix().e) / SCALE,
+			(car.center_sensor_top_view.getWorldTransformMatrix().f) / SCALE);
+
+	car.ray_left_view.setTo(
+		ray_left_p1.x * SCALE,
+		ray_left_p1.y * SCALE,
+		ray_left_p2.x * SCALE,
+		ray_left_p2.y * SCALE);
+
+	car.ray_right_view.setTo(
+		ray_right_p1.x * SCALE,
+		ray_right_p1.y * SCALE,
+		ray_right_p2.x * SCALE,
+		ray_right_p2.y * SCALE);
+
+	car.ray_center_view.setTo(
+		ray_center_p1.x * SCALE,
+		ray_center_p1.y * SCALE,
+		ray_center_p2.x * SCALE,
+		ray_center_p2.y * SCALE);
+
+	// raycast
+	model.world.RayCast(
+		function(f, p, n, fr){
+			// console.log(f.GetUserData(), fr);
+			const type: string = JSON.parse(f.GetUserData())["type"];
+
+			if (type == "track") {
+				car.lsv = Math.round((1 - fr) * 100) / 100;
+			}
+			
+			return 0;
+		},
+		ray_left_p1,
+		ray_left_p2);
+
+	model.world.RayCast(
+		function(f, p, n, fr){
+			const type: string = JSON.parse(f.GetUserData())["type"];
+
+			if (type == "track") {
+				car.rsv = Math.round((1 - fr) * 100) / 100;
+			}
+			
+			return 0;
+		},
+		ray_right_p1,
+		ray_right_p2);
+
+	model.world.RayCast(
+		function(f, p, n, fr){
+			const type: string = JSON.parse(f.GetUserData())["type"];
+
+			if (type == "track") {
+				car.csv = Math.round((1 - fr) * 100) / 100;
+			}
+			
+			return 0;
+		},
+		ray_center_p1,
+		ray_center_p2);
+
+	if (car.lsv == 0)
+		car.ray_left_view.strokeColor = 0x00ff00;
+	else
+		car.ray_left_view.strokeColor = 0xff0000;
+
+	if (car.rsv == 0)
+		car.ray_right_view.strokeColor = 0x00ff00;
+	else
+		car.ray_right_view.strokeColor = 0xff0000;
+
+	if (car.csv == 0)
+		car.ray_center_view.strokeColor = 0x00ff00;
+	else
+		car.ray_center_view.strokeColor = 0xff0000;
+
+	let speed: number =
+		Math.round(
+			((Phaser.Math.Distance.Between(
+				car.previous_position[0],
+				car.previous_position[1],
+				car.car_container.x,
+				car.car_container.y) / (delta / 1000)) / SCALE) * 10) / 10;
+
+	car.total_distance += Phaser.Math.Distance.Between(
+		car.previous_position[0],
+		car.previous_position[1],
+		car.car_container.x,
+		car.car_container.y) / SCALE;
+
+	car.previous_position = [car.car_container.x, car.car_container.y];
+
+	let input_layer: number[][] = [
+		[car.lsv, car.csv, car.rsv]
+	];
+
+	car.nn.layers = [ input_layer ];
+	let forward_propagated_nn: NeuralNetworkModel = forward_propagate(car.nn);
+
+	let output: any = last_layer(forward_propagated_nn);
+	let output_non_activated: any = last_non_activated_layer(forward_propagated_nn);
+
+	let steering: number = (0.8 - output_non_activated[0][1]);
+
+	// steering_text.setText("Output: " + Math.round(output[0][0] * 100) / 100 + ", " + Math.round(steering * 100) / 100);
+	// steering_text.setPosition(this.cameras.main.scrollX + 5, this.cameras.main.scrollY + 130);
+
+	// if (output[0][2] >= 0.5)
+	// 	acceleration = 1;
+
+	// console.log(output[0][0]);
+	// console.log(output[0][1]);
+	// console.log(output[0][2]);
+
+	// wheel views
+
+	car.front_axle_view.rotation = car.front_axle.GetAngle() - car.car_body.GetAngle();
+
+	// car view
+
+	car.car_container.x = car.car_body.GetPosition().x * SCALE;
+	car.car_container.y = car.car_body.GetPosition().y * SCALE;
+	car.car_container.setRotation(car.car_body.GetAngle());
+
+	// movement
+
+	let acceration_force: number = 150;
+
+	// if (cursors.up.isDown) {
+	// 	front_axle.ApplyForce(
+	// 		new Vec2(
+	// 			Math.sin(front_axle.GetAngle()) * acceration_force,
+	// 			-Math.cos(front_axle.GetAngle()) * acceration_force
+	// 		),
+	// 		front_axle.GetWorldCenter()
+	// 	);
+	// } else if (cursors.down.isDown) {
+	// 	front_axle.ApplyForce(
+	// 		new Vec2(
+	// 			-Math.sin(front_axle.GetAngle()) * acceration_force,
+	// 			Math.cos(front_axle.GetAngle()) * acceration_force
+	// 		),
+	// 		front_axle.GetWorldCenter()
+	// 	);
+	// } else {
+		
+	// }
+
+	car.front_axle.ApplyForce(
+			new Vec2(
+				Math.sin(car.front_axle.GetAngle()) * output[0][0] * acceration_force,
+				-Math.cos(car.front_axle.GetAngle()) * output[0][0] * acceration_force
+			),
+			car.front_axle.GetWorldCenter()
+		);
+
+	// steering
+
+	let torque: number = 0.3;
+
+	// if (cursors.left.isDown) {
+	// 	front_axle_joint.SetMotorSpeed(-torque);
+	// } else if (cursors.right.isDown) {
+	// 	front_axle_joint.SetMotorSpeed(torque);
+	// } else if (output_non_activated[0][1] == 0) {
+	// 	if (front_axle_joint.GetJointAngle() != 0) {
+	// 		if (front_axle_joint.GetJointAngle() > 0)
+	// 			front_axle_joint.SetMotorSpeed(-torque);
+	// 		else
+	// 			front_axle_joint.SetMotorSpeed(torque);
+	// 	}
+	// }
+
+	car.front_axle_joint.SetMotorSpeed(steering);
+
 	return car;
 }
 
@@ -385,4 +602,12 @@ function add_car_to_simulation(model: SimulationModel, car: Car): SimulationMode
 	new_model.generations[new_model.current_generation_index].cars.push(car);
 
 	return new_model;
+}
+
+function remove_car_from_world(model: SimulationModel, car: Car): void {
+	model.world.DestroyBody(car.car_body);
+}
+
+function mark_car_for_destruction(car: Car): void {
+	dq.queue.push(car);
 }
