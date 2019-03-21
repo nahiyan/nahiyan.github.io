@@ -52,7 +52,8 @@ function clone_sm(model) {
         population_size: model.population_size,
         layer_sizes: model.layer_sizes,
         world: model.world,
-        scene: model.scene
+        scene: model.scene,
+        car_count: model.car_count
     };
 }
 function range(size, startAt) {
@@ -77,6 +78,33 @@ function deg_to_rad(value) {
     // 180 deg = 1 pi rad
     // x deg = (1 pi / 180) * x
     return (Math.PI / 180) * value;
+}
+function gaussian(mean, stdev) {
+    var y2;
+    var use_last = false;
+    return function () {
+        var y1;
+        if (use_last) {
+            y1 = y2;
+            use_last = false;
+        }
+        else {
+            var x1, x2, w;
+            do {
+                x1 = 2.0 * Math.random() - 1.0;
+                x2 = 2.0 * Math.random() - 1.0;
+                w = x1 * x1 + x2 * x2;
+            } while (w >= 1.0);
+            w = Math.sqrt((-2.0 * Math.log(w)) / w);
+            y1 = x1 * w;
+            y2 = x2 * w;
+            use_last = true;
+        }
+        var retval = mean + stdev * y1;
+        if (retval > 0)
+            return retval;
+        return -retval;
+    };
 }
 function prepare_world(scene) {
     // world
@@ -178,6 +206,48 @@ function random_weights(layer_sizes) {
     }
     return weights;
 }
+// function random_weights(layer_sizes: number[]): any {
+//     let weights: any = [];
+//     const normal_dist = gaussian(0, 1);
+//     let i: any;
+//     for (i in range(len(layer_sizes))) {
+//         // skip the first layer, as it has no previous layer
+//         if(i != 0) {
+//             const r: number[] = range(layer_sizes[i - 1]);
+//             const c: number[] = range(layer_sizes[i]);
+//             weights.push([]);
+//             r.forEach(function(i: number) {
+//                 let rows: number[] = [];
+//                 c.forEach(function(j: number) {
+//                     rows.push(normal_dist());
+//                 });
+//                 weights[len(weights) - 1].push(rows);
+//             });
+//         }
+//     }
+//     return weights;
+// }
+// function random_biases(layer_sizes: number[]): any {
+//     let biases: any = [];
+//     const normal_dist = gaussian(0, 1);
+//     let i: any;
+//     for (i in range(len(layer_sizes))) {
+//         // skip the first layer, as it has no previous layer
+//         if(i != 0) {
+//             const r: number[] = range(1);
+//             const c: number[] = range(layer_sizes[i]);
+//             biases.push([]);
+//             r.forEach(function(i: number) {
+//                 let rows: number[] = [];
+//                 c.forEach(function(j: number) {
+//                     rows.push(normal_dist());
+//                 });
+//                 biases[len(biases) - 1].push(rows);
+//             });
+//         }
+//     }
+//     return biases;
+// }
 function random_biases(layer_sizes) {
     var biases = [];
     var i;
@@ -567,12 +637,10 @@ function create() {
     var starting_time = this.time.now;
     // setup input
     cursors = this.input.keyboard.createCursorKeys();
-    // let distance_text: any = this.add.text(5, 20, "Distance: 0");
-    // let speed_text: any = this.add.text(5, 50, "Speed: 0");
-    // let current_generation_text: any = this.add.text(5, 70, "Generation: 0");
-    // let current_individual_text: any = this.add.text(5, 70, "Individual: 0");
-    // let sensors_text: any = this.add.text(5, 70, "Sensors: 0");
-    // let steering_text: any = this.add.text(5, 70, "Steering: ");
+    // text
+    distance_text = this.add.text(5, 20, "Distance: 0");
+    speed_text = this.add.text(5, 50, "Speed: 0");
+    current_generation_text = this.add.text(5, 70, "Generation: 0");
     // TODO: add initial generation
     sm = initialize_evolution(sm);
     // let car: Car = sm.generations[0].cars[0];
@@ -612,6 +680,9 @@ var dq = {
     queue: []
 };
 var furthest_car;
+var distance_text;
+var speed_text;
+var current_generation_text;
 function gameover(scene, time) {
     scene.scene.restart();
     // 	let average_speed = total_distance / ((scene.time.now - starting_time) / 1000);
@@ -640,7 +711,8 @@ function preload() {
         population_size: 50,
         layer_sizes: [3, 5, 3, 2],
         world: prepare_world(this),
-        scene: this
+        scene: this,
+        car_count: 0
     };
 }
 function update(time, delta) {
@@ -663,8 +735,15 @@ function update(time, delta) {
     lg.cars.forEach(function (car) {
         if (car.total_distance > furthest_car.total_distance)
             furthest_car = car;
-        step_car(sm, car, delta);
+        if (!car.destroyed)
+            step_car(sm, car, delta);
     });
+    // camera
+    this.cameras.main.setScroll(furthest_car.car_body.GetPosition().x * SCALE - 300, furthest_car.car_body.GetPosition().y * SCALE - 300);
+    // text
+    distance_text.setText("Distance: " + Math.round(furthest_car.total_distance * 100) / 100);
+    distance_text.x = this.cameras.main.ScrollX;
+    distance_text.y = this.cameras.main.ScrollY;
 }
 function add_car_to_world(model, car) {
     car.creation_timestamp = Date.now();
@@ -847,8 +926,6 @@ function create_car(model) {
     };
 }
 function step_car(model, car, delta) {
-    if (car.destroyed)
-        return car;
     car.lsv, car.csv, car.rsv = 0, 0, 0;
     var ray_left_p1 = new Vec2((car.left_sensor_bottom_view.getWorldTransformMatrix().e) / SCALE, (car.left_sensor_bottom_view.getWorldTransformMatrix().f) / SCALE);
     var ray_left_p2 = new Vec2((car.left_sensor_top_view.getWorldTransformMatrix().e) / SCALE, (car.left_sensor_top_view.getWorldTransformMatrix().f) / SCALE);

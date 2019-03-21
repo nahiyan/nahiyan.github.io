@@ -27,6 +27,16 @@ function update (time, delta) {
 		if (car.total_distance > furthest_car.total_distance)
 			furthest_car = car;
 
-		step_car(sm, car, delta);
+		if (!car.destroyed)
+			step_car(sm, car, delta);
 	});
+
+	// camera
+
+	this.cameras.main.setScroll(furthest_car.car_body.GetPosition().x * SCALE - 300, furthest_car.car_body.GetPosition().y * SCALE - 300);
+
+	// text
+	distance_text.setText("Distance: " + Math.round(furthest_car.total_distance * 100) / 100);
+	distance_text.x = this.cameras.main.ScrollX;
+	distance_text.y = this.cameras.main.ScrollY;
 }

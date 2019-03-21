@@ -5,12 +5,11 @@ function create() {
 
 	cursors = this.input.keyboard.createCursorKeys();
 
-	// let distance_text: any = this.add.text(5, 20, "Distance: 0");
-	// let speed_text: any = this.add.text(5, 50, "Speed: 0");
-	// let current_generation_text: any = this.add.text(5, 70, "Generation: 0");
-	// let current_individual_text: any = this.add.text(5, 70, "Individual: 0");
-	// let sensors_text: any = this.add.text(5, 70, "Sensors: 0");
-	// let steering_text: any = this.add.text(5, 70, "Steering: ");
+	// text
+
+	distance_text = this.add.text(5, 20, "Distance: 0");
+	speed_text = this.add.text(5, 50, "Speed: 0");
+	current_generation_text = this.add.text(5, 70, "Generation: 0");
 
 	// TODO: add initial generation
 

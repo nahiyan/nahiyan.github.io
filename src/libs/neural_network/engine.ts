@@ -24,6 +24,62 @@ function random_weights(layer_sizes: number[]): any {
     return weights;
 }
 
+// function random_weights(layer_sizes: number[]): any {
+//     let weights: any = [];
+
+//     const normal_dist = gaussian(0, 1);
+    
+//     let i: any;
+//     for (i in range(len(layer_sizes))) {
+//         // skip the first layer, as it has no previous layer
+//         if(i != 0) {
+//             const r: number[] = range(layer_sizes[i - 1]);
+//             const c: number[] = range(layer_sizes[i]);
+
+//             weights.push([]);
+
+//             r.forEach(function(i: number) {
+//                 let rows: number[] = [];
+//                 c.forEach(function(j: number) {
+//                     rows.push(normal_dist());
+//                 });
+
+//                 weights[len(weights) - 1].push(rows);
+//             });
+//         }
+//     }
+
+//     return weights;
+// }
+
+// function random_biases(layer_sizes: number[]): any {
+//     let biases: any = [];
+
+//     const normal_dist = gaussian(0, 1);
+    
+//     let i: any;
+//     for (i in range(len(layer_sizes))) {
+//         // skip the first layer, as it has no previous layer
+//         if(i != 0) {
+//             const r: number[] = range(1);
+//             const c: number[] = range(layer_sizes[i]);
+
+//             biases.push([]);
+
+//             r.forEach(function(i: number) {
+//                 let rows: number[] = [];
+//                 c.forEach(function(j: number) {
+//                     rows.push(normal_dist());
+//                 });
+
+//                 biases[len(biases) - 1].push(rows);
+//             });
+//         }
+//     }
+
+//     return biases;
+// }
+
 function random_biases(layer_sizes: number[]): any {
     let biases: any = [];
 

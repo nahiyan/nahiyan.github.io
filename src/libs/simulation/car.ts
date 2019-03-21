@@ -398,9 +398,6 @@ function create_car(model: SimulationModel): Car {
 }
 
 function step_car(model: SimulationModel, car: Car, delta: number): Car {
-	if (car.destroyed)
-		return car;
-
 	car.lsv, car.csv, car.rsv = 0, 0, 0;
 
 	let ray_left_p1 =

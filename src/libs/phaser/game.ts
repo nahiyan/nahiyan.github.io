@@ -25,6 +25,7 @@ interface SimulationModel {
     layer_sizes: number[];
     world: any;
     scene: any;
+    car_count: number;
 }
 
 interface Category {
@@ -61,3 +62,7 @@ let dq: DestructionQueue = {
 };
 
 let furthest_car: Car;
+
+let distance_text: any;
+let speed_text: any;
+let current_generation_text: any;
