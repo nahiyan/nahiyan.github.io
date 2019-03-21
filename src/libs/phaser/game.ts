@@ -60,10 +60,4 @@ let dq: DestructionQueue = {
     queue: []
 };
 
-// var ground_width = 700, ground_height = 15;
-// var ball_view, car_view;
-
-// var world, ball, ground, car_body, front_axle, rear_axle, right_sensor;
-
-// var current_individual_index = [0, 0];
-// var starting_time;
+let furthest_car: Car;

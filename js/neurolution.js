@@ -82,11 +82,11 @@ function prepare_world(scene) {
     // world
     var world = new box2d.b2World(new Vec2(0, 0), true);
     // debug draw
-    var debug_draw = new box2d.b2DebugDraw();
-    debug_draw.SetSprite(document.getElementById("debug").getContext('2d'));
-    debug_draw.SetDrawScale(SCALE);
-    debug_draw.SetFlags(box2d.b2DebugDraw.e_shapeBit | box2d.b2DebugDraw.e_jointBit);
-    world.SetDebugDraw(debug_draw);
+    // var debug_draw = new box2d.b2DebugDraw();
+    // debug_draw.SetSprite((document.getElementById("debug") as HTMLCanvasElement).getContext('2d'));
+    // debug_draw.SetDrawScale(SCALE);
+    // debug_draw.SetFlags(box2d.b2DebugDraw.e_shapeBit | box2d.b2DebugDraw.e_jointBit);
+    // world.SetDebugDraw(debug_draw);
     // contact listener
     var contact_listener = new box2d.b2ContactListener();
     contact_listener.BeginContact = function (c) {
@@ -94,7 +94,6 @@ function prepare_world(scene) {
         var b = JSON.parse(c.GetFixtureB().GetUserData());
         if (a["type"] == "car" && b["type"] == "track") {
             var car = sm.generations[a["generation_index"]].cars[a["car_index"]];
-            // console.log(a["generation_index"], a["car_index"]);
             mark_car_for_destruction(car);
         }
         // if ()
@@ -336,6 +335,7 @@ function initialize_evolution(model) {
     for (var i in range(model.population_size)) {
         first_gen.cars.push(create_car(model));
     }
+    furthest_car = first_gen.cars[0];
     return new_model;
 }
 function fitness(distance, avg_speed) {
@@ -611,11 +611,7 @@ var mask = {
 var dq = {
     queue: []
 };
-// var ground_width = 700, ground_height = 15;
-// var ball_view, car_view;
-// var world, ball, ground, car_body, front_axle, rear_axle, right_sensor;
-// var current_individual_index = [0, 0];
-// var starting_time;
+var furthest_car;
 function gameover(scene, time) {
     scene.scene.restart();
     // 	let average_speed = total_distance / ((scene.time.now - starting_time) / 1000);
@@ -641,7 +637,7 @@ function preload() {
     sm = {
         generations: [],
         current_generation_index: 0,
-        population_size: 1,
+        population_size: 50,
         layer_sizes: [3, 5, 3, 2],
         world: prepare_world(this),
         scene: this
@@ -652,216 +648,26 @@ function update(time, delta) {
     if (len(dq.queue) != 0) {
         dq.queue.forEach(function (car) {
             remove_car_from_world(sm, car);
+            remove_car_from_scene(car);
+            var time = (Date.now() - car.creation_timestamp) / 1000;
+            car.fitness = fitness(car.total_distance, car.total_distance / time);
         });
         dq.queue = [];
     }
-    sm.world.Step(1 / 30, delta, delta);
-    sm.world.DrawDebugData();
+    // box2d step
+    sm.world.Step(1 / 30, 10, 10);
+    // sm.world.DrawDebugData();
     sm.world.ClearForces();
+    // cars step
     var lg = last_generation(sm);
     lg.cars.forEach(function (car) {
+        if (car.total_distance > furthest_car.total_distance)
+            furthest_car = car;
         step_car(sm, car, delta);
     });
-    // 	lsv = 0, csv = 0, rsv = 0;
-    // 	let ray_left_p1 =
-    // 		new Vec2(
-    // 			(left_sensor_bottom_view.getWorldTransformMatrix().e) / SCALE,
-    // 			(left_sensor_bottom_view.getWorldTransformMatrix().f) / SCALE);
-    // 	let ray_left_p2 =
-    // 		new Vec2(
-    // 			(left_sensor_top_view.getWorldTransformMatrix().e) / SCALE,
-    // 			(left_sensor_top_view.getWorldTransformMatrix().f) / SCALE);
-    // 	let ray_right_p1 =
-    // 		new Vec2(
-    // 			(right_sensor_bottom_view.getWorldTransformMatrix().e) / SCALE,
-    // 			(right_sensor_bottom_view.getWorldTransformMatrix().f) / SCALE);
-    // 	let ray_right_p2 =
-    // 		new Vec2(
-    // 			(right_sensor_top_view.getWorldTransformMatrix().e) / SCALE,
-    // 			(right_sensor_top_view.getWorldTransformMatrix().f) / SCALE);
-    // 	let ray_center_p1 =
-    // 		new Vec2(
-    // 			(center_sensor_bottom_view.getWorldTransformMatrix().e) / SCALE,
-    // 			(center_sensor_bottom_view.getWorldTransformMatrix().f) / SCALE);
-    // 	let ray_center_p2 =
-    // 		new Vec2(
-    // 			(center_sensor_top_view.getWorldTransformMatrix().e) / SCALE,
-    // 			(center_sensor_top_view.getWorldTransformMatrix().f) / SCALE);
-    // 	ray_left_view.setTo(
-    // 		ray_left_p1.x * SCALE,
-    // 		ray_left_p1.y * SCALE,
-    // 		ray_left_p2.x * SCALE,
-    // 		ray_left_p2.y * SCALE);
-    // 	ray_right_view.setTo(
-    // 		ray_right_p1.x * SCALE,
-    // 		ray_right_p1.y * SCALE,
-    // 		ray_right_p2.x * SCALE,
-    // 		ray_right_p2.y * SCALE);
-    // 	ray_center_view.setTo(
-    // 		ray_center_p1.x * SCALE,
-    // 		ray_center_p1.y * SCALE,
-    // 		ray_center_p2.x * SCALE,
-    // 		ray_center_p2.y * SCALE);
-    // 	// raycast
-    // 	world.RayCast(
-    // 		function(f, p, n, fr){
-    // 			// console.log(f.GetUserData(), fr);
-    // 			if (f.GetUserData() == "track") {
-    // 				lsv = Math.round((1 - fr) * 100) / 100;
-    // 			}
-    // 			return 0;
-    // 		},
-    // 		ray_left_p1,
-    // 		ray_left_p2);
-    // 	world.RayCast(
-    // 		function(f, p, n, fr){
-    // 			if (f.GetUserData() == "track") {
-    // 				rsv = Math.round((1 - fr) * 100) / 100;
-    // 			}
-    // 			return 0;
-    // 		},
-    // 		ray_right_p1,
-    // 		ray_right_p2);
-    // 	world.RayCast(
-    // 		function(f, p, n, fr){
-    // 			// console.log(f.GetUserData(), fr);
-    // 			if (f.GetUserData() == "track") {
-    // 				csv = Math.round((1 - fr) * 100) / 100;
-    // 			}
-    // 			return 0;
-    // 		},
-    // 		ray_center_p1,
-    // 		ray_center_p2);
-    // 	if (lsv == 0)
-    // 		ray_left_view.strokeColor = 0x00ff00;
-    // 	else
-    // 		ray_left_view.strokeColor = 0xff0000;
-    // 	if (rsv == 0)
-    // 		ray_right_view.strokeColor = 0x00ff00;
-    // 	else
-    // 		ray_right_view.strokeColor = 0xff0000;
-    // 	if (csv == 0)
-    // 		ray_center_view.strokeColor = 0x00ff00;
-    // 	else
-    // 		ray_center_view.strokeColor = 0xff0000;
-    // 	let speed =
-    // 		Math.round(
-    // 			((Phaser.Math.Distance.Between(
-    // 				previous_position[0],
-    // 				previous_position[1],
-    // 				car.x,
-    // 				car.y) / (delta / 1000)) / SCALE) * 10) / 10;
-    // 	total_distance += Phaser.Math.Distance.Between(
-    // 		previous_position[0],
-    // 		previous_position[1],
-    // 		car.x,
-    // 		car.y) / SCALE;
-    // 	speed_text.setText("Speed: " + speed + " m/s");
-    // 	distance_text.setText("Distance: " + Math.round(total_distance) + " m");
-    // 	current_generation_text.setText("Generation: " + current_individual_index[0]);
-    // 	current_individual_text.setText("Individual: " + current_individual_index[1]);
-    // 	previous_position = [car.x, car.y];
-    // 	// camera
-    // this.cameras.main.setScroll(car_body.GetPosition().x * SCALE - 300, car_body.GetPosition().y * SCALE - 300);
-    // 	// keep text position fixed
-    // 	speed_text.setPosition(this.cameras.main.scrollX + 5, this.cameras.main.scrollY + 20);
-    // 	distance_text.setPosition(this.cameras.main.scrollX + 5, this.cameras.main.scrollY + 50);
-    // 	current_generation_text.setPosition(this.cameras.main.scrollX + 5, this.cameras.main.scrollY + 70);
-    // 	current_individual_text.setPosition(this.cameras.main.scrollX + 5, this.cameras.main.scrollY + 90);
-    // 	// neural network
-    // 	// var lsv = 0, rsv = 0, csv = 0;
-    // 	// if (left_sensor_intersections >= 1)
-    // 	// 	lsv = 1;
-    // 	// if (right_sensor_intersections >= 1)
-    // 	// 	rsv = 1;
-    // 	// if (center_sensor_intersections >= 1)
-    // 	// 	csv = 1;
-    // 	sensors_text.setText("Sensors: " + lsv + ", " + csv + ", " + rsv);
-    // 	sensors_text.setPosition(this.cameras.main.scrollX + 5, this.cameras.main.scrollY + 110);
-    // 	var input_layer = [
-    // 		[lsv, csv, rsv]
-    // 	];
-    // 	var output = output_layer(input_layer, current_individual);
-    // 	var output_non_activated =
-    // 		last_non_activated_layer(
-    // 			forward_propagate(current_individual));
-    // 	let steering: number = (0.8 - output_non_activated[0][1]);
-    // 	// var steering = 0;
-    // 	// var acceleration = 1;
-    // 	// if (output[0][0] - output[0][1] >= 0.01) {
-    // 	// 	steering = -1;
-    // 	// 	// steering_text.setText("Steering: Left");
-    // 	// } else if (output[0][1] - output[0][0] >= 0.01) {
-    // 	// 	steering = 1;
-    // 	// 	// steering_text.setText("Steering: Right");
-    // 	// }
-    // 	steering_text.setText("Output: " + Math.round(output[0][0] * 100) / 100 + ", " + Math.round(steering * 100) / 100);
-    // 	steering_text.setPosition(this.cameras.main.scrollX + 5, this.cameras.main.scrollY + 130);
-    // 	// if (output[0][2] >= 0.5)
-    // 	// 	acceleration = 1;
-    // 	// console.log(output[0][0]);
-    // 	// console.log(output[0][1]);
-    // 	// console.log(output[0][2]);
-    // 	// physics
-    // 	world.Step(1 / 30, delta, delta);
-    // 	world.DrawDebugData();
-    // 	world.ClearForces();
-    // 	// wheel views
-    // 	front_axle_view.rotation = front_axle.GetAngle() - car_body.GetAngle();
-    // 	// ball view
-    // 	ball_view.x = ball.GetPosition().x * SCALE;
-    // 	ball_view.y = ball.GetPosition().y * SCALE;
-    // 	ball_view.setAngle(rad_to_deg(ball.GetAngle()));
-    // 	// car view
-    // 	car.x = car_body.GetPosition().x * SCALE;
-    // 	car.y = car_body.GetPosition().y * SCALE;
-    // 	car.setRotation(car_body.GetAngle());
-    // 	// setup input
-    // 	cursors = this.input.keyboard.createCursorKeys();
-    // 	// movement
-    // 	acceration_force = 30;
-    // 	// if (cursors.up.isDown) {
-    // 	// 	front_axle.ApplyForce(
-    // 	// 		new Vec2(
-    // 	// 			Math.sin(front_axle.GetAngle()) * acceration_force,
-    // 	// 			-Math.cos(front_axle.GetAngle()) * acceration_force
-    // 	// 		),
-    // 	// 		front_axle.GetWorldCenter()
-    // 	// 	);
-    // 	// } else if (cursors.down.isDown) {
-    // 	// 	front_axle.ApplyForce(
-    // 	// 		new Vec2(
-    // 	// 			-Math.sin(front_axle.GetAngle()) * acceration_force,
-    // 	// 			Math.cos(front_axle.GetAngle()) * acceration_force
-    // 	// 		),
-    // 	// 		front_axle.GetWorldCenter()
-    // 	// 	);
-    // 	// } else {
-    // 	// }
-    // 	front_axle.ApplyForce(
-    // 			new Vec2(
-    // 				Math.sin(front_axle.GetAngle()) * output[0][0] * acceration_force,
-    // 				-Math.cos(front_axle.GetAngle()) * output[0][0] * acceration_force
-    // 			),
-    // 			front_axle.GetWorldCenter()
-    // 		);
-    // 	// steering
-    // 	torque = 0.3;
-    // 	// if (cursors.left.isDown) {
-    // 	// 	front_axle_joint.SetMotorSpeed(-torque);
-    // 	// } else if (cursors.right.isDown) {
-    // 	// 	front_axle_joint.SetMotorSpeed(torque);
-    // 	// } else if (output_non_activated[0][1] == 0) {
-    // 	// 	if (front_axle_joint.GetJointAngle() != 0) {
-    // 	// 		if (front_axle_joint.GetJointAngle() > 0)
-    // 	// 			front_axle_joint.SetMotorSpeed(-torque);
-    // 	// 		else
-    // 	// 			front_axle_joint.SetMotorSpeed(torque);
-    // 	// 	}
-    // 	// }
-    // 	front_axle_joint.SetMotorSpeed(steering);
 }
 function add_car_to_world(model, car) {
+    car.creation_timestamp = Date.now();
     // car body
     var car_body_shape = new box2d.b2PolygonShape();
     car_body_shape.SetAsBox(23 / SCALE, 50 / SCALE);
@@ -1041,6 +847,8 @@ function create_car(model) {
     };
 }
 function step_car(model, car, delta) {
+    if (car.destroyed)
+        return car;
     car.lsv, car.csv, car.rsv = 0, 0, 0;
     var ray_left_p1 = new Vec2((car.left_sensor_bottom_view.getWorldTransformMatrix().e) / SCALE, (car.left_sensor_bottom_view.getWorldTransformMatrix().f) / SCALE);
     var ray_left_p2 = new Vec2((car.left_sensor_top_view.getWorldTransformMatrix().e) / SCALE, (car.left_sensor_top_view.getWorldTransformMatrix().f) / SCALE);
@@ -1096,7 +904,7 @@ function step_car(model, car, delta) {
     var forward_propagated_nn = forward_propagate(car.nn);
     var output = last_layer(forward_propagated_nn);
     var output_non_activated = last_non_activated_layer(forward_propagated_nn);
-    var steering = (0.8 - output_non_activated[0][1]);
+    var steering = (0.9 - output_non_activated[0][1]);
     // steering_text.setText("Output: " + Math.round(output[0][0] * 100) / 100 + ", " + Math.round(steering * 100) / 100);
     // steering_text.setPosition(this.cameras.main.scrollX + 5, this.cameras.main.scrollY + 130);
     // if (output[0][2] >= 0.5)
@@ -1111,7 +919,7 @@ function step_car(model, car, delta) {
     car.car_container.y = car.car_body.GetPosition().y * SCALE;
     car.car_container.setRotation(car.car_body.GetAngle());
     // movement
-    var acceration_force = 150;
+    var acceration_force = 20;
     // if (cursors.up.isDown) {
     // 	front_axle.ApplyForce(
     // 		new Vec2(
@@ -1130,7 +938,7 @@ function step_car(model, car, delta) {
     // 	);
     // } else {
     // }
-    car.front_axle.ApplyForce(new Vec2(Math.sin(car.front_axle.GetAngle()) * output[0][0] * acceration_force, -Math.cos(car.front_axle.GetAngle()) * output[0][0] * acceration_force), car.front_axle.GetWorldCenter());
+    car.front_axle.ApplyForce(new Vec2(Math.sin(car.front_axle.GetAngle()) * output[0][0] * acceration_force * delta, -Math.cos(car.front_axle.GetAngle()) * output[0][0] * acceration_force * delta), car.front_axle.GetWorldCenter());
     // steering
     var torque = 0.3;
     // if (cursors.left.isDown) {
@@ -1145,7 +953,7 @@ function step_car(model, car, delta) {
     // 			front_axle_joint.SetMotorSpeed(torque);
     // 	}
     // }
-    car.front_axle_joint.SetMotorSpeed(steering);
+    car.front_axle_joint.SetMotorSpeed(steering * delta);
     return car;
 }
 function add_car_to_simulation(model, car) {
@@ -1155,9 +963,27 @@ function add_car_to_simulation(model, car) {
 }
 function remove_car_from_world(model, car) {
     model.world.DestroyBody(car.car_body);
+    model.world.DestroyBody(car.front_axle);
+    model.world.DestroyBody(car.rear_axle);
+}
+function remove_car_from_scene(car) {
+    car.car_container.destroy();
+    car.ray_left_view.destroy();
+    car.ray_center_view.destroy();
+    car.ray_right_view.destroy();
 }
 function mark_car_for_destruction(car) {
-    dq.queue.push(car);
+    car.destroyed = true;
+    var already_marked = false;
+    dq.queue.forEach(function (subject) {
+        if (subject.user_data == car.user_data) {
+            already_marked = true;
+            return;
+        }
+    });
+    if (!already_marked) {
+        dq.queue.push(car);
+    }
 }
 function clone_road_track_model(model) {
     return {

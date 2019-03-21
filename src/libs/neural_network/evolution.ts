@@ -65,6 +65,8 @@ function initialize_evolution(model: SimulationModel): SimulationModel {
 		first_gen.cars.push(create_car(model));
 	}
 
+	furthest_car = first_gen.cars[0];
+
 	return new_model;
 }
 

@@ -33,9 +33,15 @@ interface Car {
 	right_sensor_bottom_view?: any;
 
 	user_data: string;
+
+	destroyed?: boolean;
+
+	creation_timestamp?: number;
 }
 
 function add_car_to_world(model: SimulationModel, car: Car): void {
+	car.creation_timestamp = Date.now();
+
 	// car body
 
 	let car_body_shape: any = new box2d.b2PolygonShape();
@@ -392,6 +398,9 @@ function create_car(model: SimulationModel): Car {
 }
 
 function step_car(model: SimulationModel, car: Car, delta: number): Car {
+	if (car.destroyed)
+		return car;
+
 	car.lsv, car.csv, car.rsv = 0, 0, 0;
 
 	let ray_left_p1 =
@@ -495,7 +504,7 @@ function step_car(model: SimulationModel, car: Car, delta: number): Car {
 	else
 		car.ray_center_view.strokeColor = 0xff0000;
 
-	let speed: number =
+	const speed: number =
 		Math.round(
 			((Phaser.Math.Distance.Between(
 				car.previous_position[0],
@@ -511,7 +520,7 @@ function step_car(model: SimulationModel, car: Car, delta: number): Car {
 
 	car.previous_position = [car.car_container.x, car.car_container.y];
 
-	let input_layer: number[][] = [
+	const input_layer: number[][] = [
 		[car.lsv, car.csv, car.rsv]
 	];
 
@@ -521,7 +530,7 @@ function step_car(model: SimulationModel, car: Car, delta: number): Car {
 	let output: any = last_layer(forward_propagated_nn);
 	let output_non_activated: any = last_non_activated_layer(forward_propagated_nn);
 
-	let steering: number = (0.8 - output_non_activated[0][1]);
+	let steering: number = (0.9 - output_non_activated[0][1]);
 
 	// steering_text.setText("Output: " + Math.round(output[0][0] * 100) / 100 + ", " + Math.round(steering * 100) / 100);
 	// steering_text.setPosition(this.cameras.main.scrollX + 5, this.cameras.main.scrollY + 130);
@@ -545,7 +554,7 @@ function step_car(model: SimulationModel, car: Car, delta: number): Car {
 
 	// movement
 
-	let acceration_force: number = 150;
+	let acceration_force: number = 20;
 
 	// if (cursors.up.isDown) {
 	// 	front_axle.ApplyForce(
@@ -569,8 +578,8 @@ function step_car(model: SimulationModel, car: Car, delta: number): Car {
 
 	car.front_axle.ApplyForce(
 			new Vec2(
-				Math.sin(car.front_axle.GetAngle()) * output[0][0] * acceration_force,
-				-Math.cos(car.front_axle.GetAngle()) * output[0][0] * acceration_force
+				Math.sin(car.front_axle.GetAngle()) * output[0][0] * acceration_force * delta,
+				-Math.cos(car.front_axle.GetAngle()) * output[0][0] * acceration_force * delta
 			),
 			car.front_axle.GetWorldCenter()
 		);
@@ -592,7 +601,7 @@ function step_car(model: SimulationModel, car: Car, delta: number): Car {
 	// 	}
 	// }
 
-	car.front_axle_joint.SetMotorSpeed(steering);
+	car.front_axle_joint.SetMotorSpeed(steering * delta);
 
 	return car;
 }
@@ -606,8 +615,30 @@ function add_car_to_simulation(model: SimulationModel, car: Car): SimulationMode
 
 function remove_car_from_world(model: SimulationModel, car: Car): void {
 	model.world.DestroyBody(car.car_body);
+	model.world.DestroyBody(car.front_axle);
+	model.world.DestroyBody(car.rear_axle);
+}
+
+function remove_car_from_scene(car: Car): void {
+	car.car_container.destroy();
+	car.ray_left_view.destroy();
+	car.ray_center_view.destroy();
+	car.ray_right_view.destroy();
 }
 
 function mark_car_for_destruction(car: Car): void {
-	dq.queue.push(car);
+	car.destroyed = true;
+
+	let already_marked: boolean = false;
+
+	dq.queue.forEach(function(subject: Car) {
+		if (subject.user_data == car.user_data) {
+			already_marked = true;
+			return;
+		}
+	});
+
+	if (!already_marked) {
+		dq.queue.push(car);
+	}
 }

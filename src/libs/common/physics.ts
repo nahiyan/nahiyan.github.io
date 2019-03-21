@@ -5,11 +5,11 @@ function prepare_world(scene: any): any {
 
 	// debug draw
 
-	var debug_draw = new box2d.b2DebugDraw();
-	debug_draw.SetSprite((document.getElementById("debug") as HTMLCanvasElement).getContext('2d'));
-	debug_draw.SetDrawScale(SCALE);
-	debug_draw.SetFlags(box2d.b2DebugDraw.e_shapeBit | box2d.b2DebugDraw.e_jointBit);
-	world.SetDebugDraw(debug_draw);
+	// var debug_draw = new box2d.b2DebugDraw();
+	// debug_draw.SetSprite((document.getElementById("debug") as HTMLCanvasElement).getContext('2d'));
+	// debug_draw.SetDrawScale(SCALE);
+	// debug_draw.SetFlags(box2d.b2DebugDraw.e_shapeBit | box2d.b2DebugDraw.e_jointBit);
+	// world.SetDebugDraw(debug_draw);
 
 	// contact listener
 
@@ -20,8 +20,6 @@ function prepare_world(scene: any): any {
 
 		if (a["type"] == "car" && b["type"] == "track") {
 			const car: Car = sm.generations[a["generation_index"]].cars[a["car_index"]];
-
-			// console.log(a["generation_index"], a["car_index"]);
 
 			mark_car_for_destruction(car);
 		}
