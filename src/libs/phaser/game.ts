@@ -16,6 +16,7 @@ let PVec2: any = Phaser.Math.Vector2;
 
 interface Generation {
 	cars: Car[];
+    time: number;
 }
 
 interface SimulationModel {
@@ -25,7 +26,6 @@ interface SimulationModel {
     layer_sizes: number[];
     world: any;
     scene: any;
-    car_count: number;
 }
 
 interface Category {

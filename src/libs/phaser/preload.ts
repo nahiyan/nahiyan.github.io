@@ -9,10 +9,9 @@ function preload() {
 	sm = {
 	    generations: [],
 	    current_generation_index: 0,
-	    population_size: 50,
+	    population_size: 10,
 	    layer_sizes: [3, 5, 3, 2],
 	    world: prepare_world(this),
-	    scene: this,
-	    car_count: 0
+	    scene: this
 	};
 }

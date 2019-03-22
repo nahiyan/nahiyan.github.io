@@ -16,8 +16,7 @@ function clone_sm(model: SimulationModel): SimulationModel {
         population_size: model.population_size,
         layer_sizes: model.layer_sizes,
         world: model.world,
-        scene: model.scene,
-        car_count: model.car_count
+        scene: model.scene
     };
 }
 

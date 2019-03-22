@@ -37,6 +37,8 @@ interface Car {
 	destroyed?: boolean;
 
 	creation_timestamp?: number;
+
+	speed?: number;
 }
 
 function add_car_to_world(model: SimulationModel, car: Car): void {
@@ -181,7 +183,7 @@ function add_car_to_world(model: SimulationModel, car: Car): void {
 	rear_axle_and_car_joint_def.Initialize(
 		car_body, rear_axle, rear_axle.GetPosition());
 
-	rear_axle_and_car_joint_def.motorSpeed = 2;
+	rear_axle_and_car_joint_def.motorSpeed = 0;
 	rear_axle_and_car_joint_def.maxMotorTorque = 20;
 	rear_axle_and_car_joint_def.enableMotor = false;
 	rear_axle_and_car_joint_def.upperAngle = deg_to_rad(0);
@@ -501,7 +503,7 @@ function step_car(model: SimulationModel, car: Car, delta: number): Car {
 	else
 		car.ray_center_view.strokeColor = 0xff0000;
 
-	const speed: number =
+	car.speed =
 		Math.round(
 			((Phaser.Math.Distance.Between(
 				car.previous_position[0],
@@ -526,8 +528,6 @@ function step_car(model: SimulationModel, car: Car, delta: number): Car {
 
 	let output: any = last_layer(forward_propagated_nn);
 	let output_non_activated: any = last_non_activated_layer(forward_propagated_nn);
-
-	let steering: number = (0.9 - output_non_activated[0][1]);
 
 	// steering_text.setText("Output: " + Math.round(output[0][0] * 100) / 100 + ", " + Math.round(steering * 100) / 100);
 	// steering_text.setPosition(this.cameras.main.scrollX + 5, this.cameras.main.scrollY + 130);
@@ -583,7 +583,9 @@ function step_car(model: SimulationModel, car: Car, delta: number): Car {
 
 	// steering
 
-	let torque: number = 0.3;
+	let steering: number = (0.9 - output_non_activated[0][1]);
+
+	let torque: number = 50;
 
 	// if (cursors.left.isDown) {
 	// 	front_axle_joint.SetMotorSpeed(-torque);
@@ -598,7 +600,9 @@ function step_car(model: SimulationModel, car: Car, delta: number): Car {
 	// 	}
 	// }
 
-	car.front_axle_joint.SetMotorSpeed(steering * delta);
+	// car.front_axle.ApplyTorque(steering * torque * delta);
+
+	car.front_axle_joint.SetMotorSpeed(torque * steering * delta);
 
 	return car;
 }

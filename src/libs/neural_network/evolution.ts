@@ -55,7 +55,8 @@ function initialize_evolution(model: SimulationModel): SimulationModel {
 	var new_model = clone_sm(model);
 
 	let first_gen: Generation = {
-		cars: []
+		cars: [],
+		time: Date.now()
 	};
 
 	new_model.generations.push(first_gen);
@@ -78,42 +79,47 @@ function last_generation(model: SimulationModel): Generation {
 	return model.generations[len(model.generations) - 1];
 }
 
-// function breed_generation(model: SimulationModel): SimulationModel {
-// 	const selection_count: number = 6;
-// 	const mutation_rate: number = 0.2;
+function breed_generation(model: SimulationModel): SimulationModel {
+	const selection_count: number = Math.ceil(0.2 * model.population_size);
+	const mutation_rate: number = 0.02;
 
-// 	// natural selection
+	// natural selection
 
-// 	model = best_fit_select(model, selection_count);
+	model = best_fit_select(model, selection_count);
 
-// 	// cross over to fill the vacant spots
+	// cross over to fill the vacant spots
 
-// 	let lg = last_generation(model);
+	let lg: Generation = last_generation(model);
 
-// 	while (len(lg) != model.population_size) {
-// 		var random_nn_a = lg[
-// 			Math.floor(
-// 				Math.random() * lg.length)];
+	while (len(lg.cars) != model.population_size) {
+		let random_nn_a: NeuralNetworkModel = 
+			lg.cars[
+				Math.floor(
+					Math.random() * lg.cars.length)].nn;
 
-// 		var random_nn_b = lg[
-// 			Math.floor(
-// 				Math.random() * lg.length)];
+		let random_nn_b: NeuralNetworkModel =
+			lg.cars[
+				Math.floor(
+					Math.random() * lg.cars.length)].nn;
 
-// 		lg.push(
-// 			crossover(
-// 				random_nn_a, random_nn_b));
-// 	}
+		let new_car: Car = create_car(model);
+		new_car.nn =
+			crossover(
+				random_nn_a, random_nn_b);
 
-// 	model.generations[len(model.generations)] = lg;
+		lg.cars.push(new_car);
+	}
 
-// 	// mutate the neural networks
+	// model.generations[len(model.generations)] = lg;
 
-// 	for (var i = 0; i < len(lg); i++) {
-// 		model.generations[len(model.generations) - 1][i] = mutate(model.generations[len(model.generations) - 1][i], mutation_rate);
-// 	}
+	// mutate the neural networks
 
-// 	return model;
-// }
+	for (var i = 0; i < len(lg); i++) {
+		model.generations[len(model.generations) - 1][i] = mutate(model.generations[len(model.generations) - 1][i], mutation_rate);
+	}
+
+	return model;
+}
 
 function get_car(model: SimulationModel, index: number[]): Car {
 	return model.generations
@@ -148,59 +154,62 @@ function get_car(model: SimulationModel, index: number[]): Car {
 
 // takes two parents and generates a child
 
-// function crossover(parent_a, parent_b) {
-// 	// weights
+function crossover(parent_a: NeuralNetworkModel, parent_b: NeuralNetworkModel) {
+	// weights
 
-// 	new_weights = [];
+	let new_weights: any[] = [];
 
-// 	// i -> matrix representing weights between 2 layers
+	// i -> matrix representing weights between 2 layers
 
-// 	for (var i in range(len(parent_a.weights))) {
-// 		new_weights.push([]);
+	for (var i in range(len(parent_a.weights))) {
+		new_weights.push([]);
 
-// 		let size_y = len(parent_a.weights[i]);
-// 		let size_x = len(parent_a.weights[i][0]);
+		let size_y = len(parent_a.weights[i]);
+		let size_x = len(parent_a.weights[i][0]);
 
-// 		for (var j in range(size_y)) {
-// 			new_weights[i].push([]);
+		for (var j in range(size_y)) {
+			new_weights[i].push([]);
 
-// 			for (var k in range(size_x)) {
-// 				new_weights[i][j].push([]);
+			for (var k in range(size_x)) {
+				new_weights[i][j].push([]);
 
-// 				if (Math.round(random(0, 0)) == 0)
-// 					new_weights[i][j][k] = parent_a.weights[i][j][k];
-// 				else
-// 					new_weights[i][j][k] = parent_b.weights[i][j][k];
-// 			}
-// 		}
-// 	}
+				if (Math.round(random(0, 1)) == 0)
+					new_weights[i][j][k] = parent_a.weights[i][j][k];
+				else
+					new_weights[i][j][k] = parent_b.weights[i][j][k];
+			}
+		}
+	}
 
 // 	// TODO: Biases
 
-// 	// child
+	// child
 
-// 	let child = new NeuralNetwork(
-// 		weights = new_weights,
-// 		biases = parent_a.biases,
-// 		layer_sizes = parent_a.layer_sizes,
-// 		layers = []
-// 		);
+	let child: NeuralNetworkModel =  {
+		weights: new_weights,
+		biases: parent_a.biases,
+		layer_sizes: parent_a.layer_sizes,
+		layers: [],
+		identity_biases: undefined,
+		non_activated_layers: []
+	};
 
-// 	child.fitness = undefined;
+	return child;
+}
 
-// 	return child;
-// }
+function best_fit_select(model: SimulationModel, quantity: number): SimulationModel {
+	let individuals: Generation = last_generation(model);
 
-// function best_fit_select(model, quantity) {
-// 	let individuals = last_generation(model);
+	individuals.cars.sort(function(a, b){
+		return b.fitness - a.fitness;
+	});
 
-// 	individuals.sort(function(a, b){
-// 		return b.fitness - a.fitness;
-// 	});
+	let selected_individuals: Generation = {
+		cars: individuals.cars.splice(0, quantity),
+		time: Date.now()
+	};
 
-// 	let selected_individuals = individuals.splice(0, quantity);
+	model.generations.push(selected_individuals);
 
-// 	model.generations[len(model.generations) - 1] = selected_individuals;
-
-// 	return model;
-// }
+	return model;
+}
