@@ -52,7 +52,9 @@ function clone_sm(model) {
         population_size: model.population_size,
         layer_sizes: model.layer_sizes,
         world: model.world,
-        scene: model.scene
+        scene: model.scene,
+        paused: model.paused,
+        human_controlled_car: model.human_controlled_car
     };
 }
 function range(size, startAt) {
@@ -61,6 +63,9 @@ function range(size, startAt) {
 }
 function len(array) {
     return array.length;
+}
+function rand_int(min, max) {
+    return Math.floor(Math.random() * max) + min;
 }
 function random(min, max) {
     return Math.random() * (max - min) + min;
@@ -133,46 +138,74 @@ function prepare_world(scene) {
     var road_tracks_left = {
         h: 70,
         w: 2,
-        relative_position: [0, 0],
+        relative_position: [110, 300],
         scene: scene,
         world: world
     };
-    road_tracks_left = add_road_track_segment(road_tracks_left, [100, 415], deg_to_rad(0));
-    road_tracks_left = add_road_track_segment(road_tracks_left, [-7, 2], deg_to_rad(-10));
-    road_tracks_left = add_road_track_segment(road_tracks_left, [5, 2], deg_to_rad(10));
-    road_tracks_left = add_road_track_segment(road_tracks_left, [40, 5], deg_to_rad(20));
-    road_tracks_left = add_road_track_segment(road_tracks_left, [40, 5], deg_to_rad(10));
-    road_tracks_left = add_road_track_segment(road_tracks_left, [5, 5], deg_to_rad(-10));
-    road_tracks_left = add_road_track_segment(road_tracks_left, [-33, 7], deg_to_rad(-20));
-    road_tracks_left = add_road_track_segment(road_tracks_left, [-63, 20], deg_to_rad(-40));
-    road_tracks_left = add_road_track_segment(road_tracks_left, [-94, 41], deg_to_rad(-50));
-    road_tracks_left = add_road_track_segment(road_tracks_left, [-75, 30], deg_to_rad(-20));
-    road_tracks_left = add_road_track_segment(road_tracks_left, [-19, 7], deg_to_rad(0));
-    road_tracks_left = add_road_track_segment(road_tracks_left, [28, 7], deg_to_rad(20));
-    road_tracks_left = add_road_track_segment(road_tracks_left, [63, 15], deg_to_rad(30));
-    road_tracks_left = add_road_track_segment(road_tracks_left, [88, 31], deg_to_rad(45));
-    road_tracks_left = add_road_track_segment(road_tracks_left, [105, 55], deg_to_rad(55));
     var road_tracks_right = {
         h: 70,
         w: 2,
-        relative_position: [0, 0],
+        relative_position: [
+            road_tracks_left.relative_position[0] + 130,
+            road_tracks_left.relative_position[1]
+        ],
         scene: scene,
         world: world
     };
-    road_tracks_right = add_road_track_segment(road_tracks_right, [270, 415], deg_to_rad(0));
-    road_tracks_right = add_road_track_segment(road_tracks_right, [-7, 2], deg_to_rad(-10));
-    road_tracks_right = add_road_track_segment(road_tracks_right, [5, 2], deg_to_rad(10));
-    road_tracks_right = add_road_track_segment(road_tracks_right, [40, 5], deg_to_rad(20));
-    road_tracks_right = add_road_track_segment(road_tracks_right, [40, 5], deg_to_rad(10));
-    road_tracks_right = add_road_track_segment(road_tracks_right, [5, 5], deg_to_rad(-10));
-    road_tracks_right = add_road_track_segment(road_tracks_right, [-33, 7], deg_to_rad(-20));
-    road_tracks_right = add_road_track_segment(road_tracks_right, [-63, 20], deg_to_rad(-40));
-    road_tracks_right = add_road_track_segment(road_tracks_right, [-94, 41], deg_to_rad(-50));
-    road_tracks_right = add_road_track_segment(road_tracks_right, [-75, 30], deg_to_rad(-20));
-    road_tracks_right = add_road_track_segment(road_tracks_right, [-19, 7], deg_to_rad(0));
-    road_tracks_right = add_road_track_segment(road_tracks_right, [28, 7], deg_to_rad(20));
-    road_tracks_right = add_road_track_segment(road_tracks_right, [73, 21], deg_to_rad(40));
-    road_tracks_right = add_road_track_segment(road_tracks_right, [105, 47], deg_to_rad(55));
+    // left
+    add_road_track_segment(road_tracks_left, [0, 0], deg_to_rad(0));
+    add_road_track_segment(road_tracks_right, [0, 0], deg_to_rad(0));
+    add_road_track_segment(road_tracks_left, [0, 0], deg_to_rad(0));
+    add_road_track_segment(road_tracks_right, [0, 0], deg_to_rad(0));
+    add_road_track_segment(road_tracks_left, [0, 0], deg_to_rad(0));
+    add_road_track_segment(road_tracks_right, [0, 0], deg_to_rad(0));
+    add_road_track_segment(road_tracks_left, [-18, 5], deg_to_rad(-15));
+    add_road_track_segment(road_tracks_right, [-18, 5], deg_to_rad(-15));
+    add_road_track_segment(road_tracks_left, [-18 * 2, 5 * 2], deg_to_rad(-15));
+    add_road_track_segment(road_tracks_right, [-18 * 2, 5 * 2], deg_to_rad(-15));
+    add_road_track_segment(road_tracks_left, [-18 * 2, 5 * 2], deg_to_rad(-15));
+    add_road_track_segment(road_tracks_right, [-18 * 2, 5 * 2], deg_to_rad(-15));
+    add_road_track_segment(road_tracks_left, [-18, 5], deg_to_rad(0));
+    add_road_track_segment(road_tracks_right, [-18, 5], deg_to_rad(0));
+    add_road_track_segment(road_tracks_left, [0, 0], deg_to_rad(0));
+    add_road_track_segment(road_tracks_right, [0, 0], deg_to_rad(0));
+    add_road_track_segment(road_tracks_left, [18, 5], deg_to_rad(15));
+    add_road_track_segment(road_tracks_right, [18, 5], deg_to_rad(15));
+    add_road_track_segment(road_tracks_left, [16 * 3, 5 * 2], deg_to_rad(25));
+    add_road_track_segment(road_tracks_right, [16 * 3, 5 * 2], deg_to_rad(25));
+    add_road_track_segment(road_tracks_left, [17 * 4, 5 * 4], deg_to_rad(35));
+    add_road_track_segment(road_tracks_right, [15 * 5 + 2, 5 * 6], deg_to_rad(45));
+    add_road_track_segment(road_tracks_left, [18 * 5 - 2, 5 * 7], deg_to_rad(45));
+    add_road_track_segment(road_tracks_right, [19 * 6, 5 * 14 + 3], deg_to_rad(75));
+    add_road_track_segment(road_tracks_left, [18 * 7 - 10, 5 * 15 - 2], deg_to_rad(75));
+    add_road_track_segment(road_tracks_right, [19 * 7, 5 * 24 + 1], deg_to_rad(90));
+    // add_road_track_segment(road_tracks_left, [-7, 2], deg_to_rad(-10));
+    // add_road_track_segment(road_tracks_left, [5, 2], deg_to_rad(10));
+    // add_road_track_segment(road_tracks_left, [40, 5], deg_to_rad(20));
+    // add_road_track_segment(road_tracks_left, [40, 5], deg_to_rad(10));
+    // add_road_track_segment(road_tracks_left, [5, 5], deg_to_rad(-10));
+    // add_road_track_segment(road_tracks_left, [-33, 7], deg_to_rad(-20));
+    // add_road_track_segment(road_tracks_left, [-63, 20], deg_to_rad(-40));
+    // add_road_track_segment(road_tracks_left, [-94, 41], deg_to_rad(-50));
+    // add_road_track_segment(road_tracks_left, [-75, 30], deg_to_rad(-20));
+    // add_road_track_segment(road_tracks_left, [-19, 7], deg_to_rad(0));
+    // add_road_track_segment(road_tracks_left, [28, 7], deg_to_rad(20));
+    // add_road_track_segment(road_tracks_left, [63, 15], deg_to_rad(30));
+    // add_road_track_segment(road_tracks_left, [88, 31], deg_to_rad(45));
+    // add_road_track_segment(road_tracks_left, [105, 55], deg_to_rad(55));
+    // add_road_track_segment(road_tracks_right, [-7, 2], deg_to_rad(-10));
+    // add_road_track_segment(road_tracks_right, [5, 2], deg_to_rad(10));
+    // add_road_track_segment(road_tracks_right, [40, 5], deg_to_rad(20));
+    // add_road_track_segment(road_tracks_right, [40, 5], deg_to_rad(10));
+    // add_road_track_segment(road_tracks_right, [5, 5], deg_to_rad(-10));
+    // add_road_track_segment(road_tracks_right, [-33, 7], deg_to_rad(-20));
+    // add_road_track_segment(road_tracks_right, [-63, 20], deg_to_rad(-40));
+    // add_road_track_segment(road_tracks_right, [-94, 41], deg_to_rad(-50));
+    // add_road_track_segment(road_tracks_right, [-75, 30], deg_to_rad(-20));
+    // add_road_track_segment(road_tracks_right, [-19, 7], deg_to_rad(0));
+    // add_road_track_segment(road_tracks_right, [28, 7], deg_to_rad(20));
+    // add_road_track_segment(road_tracks_right, [73, 21], deg_to_rad(40));
+    // add_road_track_segment(road_tracks_right, [105, 47], deg_to_rad(55));
     return world;
 }
 function tan_h(x) {
@@ -415,91 +448,117 @@ function last_generation(model) {
     return model.generations[len(model.generations) - 1];
 }
 function breed_generation(model) {
-    var selection_count = Math.ceil(0.2 * model.population_size);
+    var selection_count = 5;
+    // const selection_count: number = Math.ceil(0.1 * model.population_size);
     var mutation_rate = 0.02;
     // natural selection
-    model = best_fit_select(model, selection_count);
+    var fittest_individuals = best_fit_select(model, selection_count);
     // cross over to fill the vacant spots
-    var lg = last_generation(model);
-    while (len(lg.cars) != model.population_size) {
-        var random_nn_a = lg.cars[Math.floor(Math.random() * lg.cars.length)].nn;
-        var random_nn_b = lg.cars[Math.floor(Math.random() * lg.cars.length)].nn;
-        var new_car = create_car(model);
-        new_car.nn =
-            crossover(random_nn_a, random_nn_b);
-        lg.cars.push(new_car);
+    var new_gen = {
+        cars: [],
+        time: Date.now()
+    };
+    model.generations.push(new_gen);
+    // fill the new generation by crossovers
+    while (len(new_gen.cars) != model.population_size) {
+        // let random_nn_a: NeuralNetworkModel = 
+        // 	fittest_individuals[
+        // 		Math.floor(
+        // 			Math.random() * len(fittest_individuals))].nn;
+        // let random_nn_b: NeuralNetworkModel =
+        // 	fittest_individuals[
+        // 		Math.floor(
+        // 			Math.random() * len(fittest_individuals))].nn;
+        new_gen.cars.push(crossover(model, fittest_individuals));
     }
-    // model.generations[len(model.generations)] = lg;
     // mutate the neural networks
-    for (var i = 0; i < len(lg); i++) {
-        model.generations[len(model.generations) - 1][i] = mutate(model.generations[len(model.generations) - 1][i], mutation_rate);
-    }
+    // for (var i = 0; i < len(new_gen); i++) {
+    // 	model.generations[len(model.generations) - 1][i] = mutate(model.generations[len(model.generations) - 1][i], mutation_rate);
+    // }
+    // mutate the newly formed generation
+    new_gen.cars.forEach(function (car) {
+        car.nn = mutate(car.nn, mutation_rate);
+    });
     return model;
 }
 function get_car(model, index) {
     return model.generations[index[0]][index[1]];
 }
-// function increment(model: SimulationModel, index: number) {
-// 	let current_generation_index = index[0];
-// 	let current_individual_index = index[1];
-// 	let new_generation_index = current_generation_index;
-// 	let new_individual_index = current_individual_index;
-// 	if (current_individual_index == model.population_size - 1) {
-// 		new_generation_index = current_generation_index + 1;
-// 		new_individual_index = 0;
-// 	} else {
-// 		new_individual_index++;
-// 	}
-// 	return [new_generation_index, new_individual_index];
-// }
-// function set_fitness(model: SimulationModel, index: number[], value: number): SimulationModel {
-// 	let new_model = clone_sm(model);
-// 	new_model.generations[index[0]][index[1]].fitness = value;
-// 	return new_model;
-// }
-// takes two parents and generates a child
-function crossover(parent_a, parent_b) {
+// takes random genes from the best fit individuals and generates a child
+function crossover(model, individuals) {
+    var new_car = create_car(model);
+    var x = 0;
+    // let size_x: number = len(new_car.nn.weights);
+    // let size_y: number = len(new_car.nn.weights[0]);
+    // let size_z: number = len(new_car.nn.weights[0][0]);
+    var individuals_count = len(individuals);
     // weights
-    var new_weights = [];
-    // i -> matrix representing weights between 2 layers
-    for (var i in range(len(parent_a.weights))) {
-        new_weights.push([]);
-        var size_y = len(parent_a.weights[i]);
-        var size_x = len(parent_a.weights[i][0]);
-        for (var j in range(size_y)) {
-            new_weights[i].push([]);
-            for (var k in range(size_x)) {
-                new_weights[i][j].push([]);
-                if (Math.round(random(0, 1)) == 0)
-                    new_weights[i][j][k] = parent_a.weights[i][j][k];
-                else
-                    new_weights[i][j][k] = parent_b.weights[i][j][k];
-            }
-        }
-    }
-    // 	// TODO: Biases
-    // child
-    var child = {
-        weights: new_weights,
-        biases: parent_a.biases,
-        layer_sizes: parent_a.layer_sizes,
-        layers: [],
-        identity_biases: undefined,
-        non_activated_layers: []
-    };
-    return child;
+    new_car.nn.weights.forEach(function (weight_layer) {
+        var y = 0;
+        weight_layer.forEach(function (weight_row) {
+            var z = 0;
+            weight_row.forEach(function (weight_col) {
+                new_car.nn.weights[x][y][z] =
+                    individuals[rand_int(0, individuals_count - 1)].nn.weights[x][y][z];
+                z++;
+            });
+            y++;
+        });
+        x++;
+    });
+    // biases
+    x = 0;
+    new_car.nn.biases.forEach(function (weight_layer) {
+        var y = 0;
+        weight_layer.forEach(function (weight_row) {
+            var z = 0;
+            weight_row.forEach(function (weight_col) {
+                new_car.nn.biases[x][y][z] =
+                    individuals[rand_int(0, individuals_count - 1)].nn.biases[x][y][z];
+                z++;
+            });
+            y++;
+        });
+        x++;
+    });
+    return new_car;
+    // weights
+    // 	let new_weights: any[] = [];
+    // 	// i -> matrix representing weights between 2 layers
+    // 	for (var i in range(len(parent_a.weights))) {
+    // 		new_weights.push([]);
+    // 		let size_y = len(parent_a.weights[i]);
+    // 		let size_x = len(parent_a.weights[i][0]);
+    // 		for (var j in range(size_y)) {
+    // 			new_weights[i].push([]);
+    // 			for (var k in range(size_x)) {
+    // 				new_weights[i][j].push([]);
+    // 				if (Math.round(random(0, 1)) == 0)
+    // 					new_weights[i][j][k] = parent_a.weights[i][j][k];
+    // 				else
+    // 					new_weights[i][j][k] = parent_b.weights[i][j][k];
+    // 			}
+    // 		}
+    // 	}
+    // // 	// TODO: Biases
+    // 	// child
+    // 	let child: NeuralNetworkModel =  {
+    // 		weights: new_weights,
+    // 		biases: parent_a.biases,
+    // 		layer_sizes: parent_a.layer_sizes,
+    // 		layers: [],
+    // 		identity_biases: undefined,
+    // 		non_activated_layers: []
+    // 	};
+    // 	return child;
 }
 function best_fit_select(model, quantity) {
     var individuals = last_generation(model);
     individuals.cars.sort(function (a, b) {
         return b.fitness - a.fitness;
     });
-    var selected_individuals = {
-        cars: individuals.cars.splice(0, quantity),
-        time: Date.now()
-    };
-    model.generations.push(selected_individuals);
-    return model;
+    var selected_individuals = individuals.cars.splice(0, quantity);
+    return selected_individuals;
 }
 // function test_result(value, fail_message) {
 // 	if (value == 1)
@@ -642,6 +701,7 @@ function create() {
     distance_text = this.add.text(5, 20, "Distance: 0");
     speed_text = this.add.text(5, 50, "Speed: 0");
     current_generation_text = this.add.text(5, 70, "Generation: 0");
+    best_fit_car_sensors_text = this.add.text(5, 90, "Sensors: 0");
     // TODO: add initial generation
     sm = initialize_evolution(sm);
     // let car: Car = sm.generations[0].cars[0];
@@ -684,6 +744,25 @@ var furthest_car;
 var distance_text;
 var speed_text;
 var current_generation_text;
+var best_fit_car_sensors_text;
+document.addEventListener("keyup", function (e) {
+    if (e.keyCode == 32)
+        if (sm.paused) {
+            sm.scene.scene.resume();
+            sm.paused = false;
+        }
+        else {
+            sm.scene.scene.pause();
+            sm.paused = true;
+        }
+    else if (e.key == 'h' || e.key == 'H')
+        if (sm.human_controlled_car === undefined || sm.human_controlled_car.destroyed) {
+            sm.human_controlled_car = furthest_car;
+        }
+        else {
+            sm.human_controlled_car = undefined;
+        }
+});
 function gameover(scene, time) {
     scene.scene.restart();
     // 	let average_speed = total_distance / ((scene.time.now - starting_time) / 1000);
@@ -704,33 +783,38 @@ function gameover(scene, time) {
 function preload() {
     // images
     this.load.image('car', 'assets/car.png');
-    this.load.image('ball', 'assets/ball.png');
     // create the simulation model
     sm = {
         generations: [],
         current_generation_index: 0,
-        population_size: 10,
+        population_size: 100,
         layer_sizes: [3, 5, 3, 2],
         world: prepare_world(this),
-        scene: this
+        scene: this,
+        paused: false,
+        human_controlled_car: undefined
     };
 }
 function update(time, delta) {
+    if (furthest_car.destroyed)
+        furthest_car.total_distance = 0;
     var lg = last_generation(sm);
     // get rid of really slow cars
     if ((Date.now() - lg.time) / 1000 > 2) {
         lg.cars.forEach(function (car) {
-            if (car.speed < 0.2)
+            if (car.speed < 0.2 && !car.destroyed && sm.human_controlled_car !== undefined && car.user_data != sm.human_controlled_car.user_data)
                 mark_car_for_destruction(car);
         });
     }
     // process destruction queue
     if (len(dq.queue) != 0) {
         dq.queue.forEach(function (car) {
-            remove_car_from_world(sm, car);
-            remove_car_from_scene(car);
-            var time = (Date.now() - car.creation_timestamp) / 1000;
-            car.fitness = fitness(car.total_distance, car.total_distance / time);
+            if (!car.destroyed) {
+                remove_car_from_world(sm, car);
+                remove_car_from_scene(car);
+                var time_1 = (Date.now() - car.creation_timestamp) / 1000;
+                car.fitness = fitness(car.total_distance, car.total_distance / time_1);
+            }
         });
         dq.queue = [];
     }
@@ -758,10 +842,11 @@ function update(time, delta) {
     sm.world.ClearForces();
     // cars step
     lg.cars.forEach(function (car) {
-        if (car.total_distance > furthest_car.total_distance)
-            furthest_car = car;
-        if (!car.destroyed)
+        if (!car.destroyed) {
             step_car(sm, car, delta);
+            if (car.total_distance > furthest_car.total_distance)
+                furthest_car = car;
+        }
     });
     // camera
     this.cameras.main.setScroll(furthest_car.car_body.GetPosition().x * SCALE - 300, furthest_car.car_body.GetPosition().y * SCALE - 300);
@@ -770,8 +855,35 @@ function update(time, delta) {
     distance_text.setPosition(this.cameras.main.scrollX + 10, this.cameras.main.scrollY + 20);
     speed_text.setText("Speed: " + Math.round(furthest_car.speed * 100) / 100);
     speed_text.setPosition(this.cameras.main.scrollX + 10, this.cameras.main.scrollY + 40);
-    current_generation_text.setText("Generation: " + sm.current_generation_index);
+    current_generation_text.setText("Generation: " + (sm.current_generation_index + 1));
     current_generation_text.setPosition(this.cameras.main.scrollX + 10, this.cameras.main.scrollY + 60);
+    best_fit_car_sensors_text.setText("Sensors: " + Math.round(furthest_car.lsv * 100) / 100 + ", " + Math.round(furthest_car.csv * 100) / 100 + ", " + Math.round(furthest_car.rsv * 100) / 100);
+    best_fit_car_sensors_text.setPosition(this.cameras.main.scrollX + 10, this.cameras.main.scrollY + 80);
+    // keyboard controls
+    var acceration_force = 1000;
+    if (sm.human_controlled_car !== undefined) {
+        if (cursors.up.isDown) {
+            sm.human_controlled_car.front_axle.ApplyForce(new Vec2(Math.sin(sm.human_controlled_car.front_axle.GetAngle()) * acceration_force, -Math.cos(sm.human_controlled_car.front_axle.GetAngle()) * acceration_force), sm.human_controlled_car.front_axle.GetWorldCenter());
+        }
+        else if (cursors.down.isDown) {
+            sm.human_controlled_car.front_axle.ApplyForce(new Vec2(-Math.sin(sm.human_controlled_car.front_axle.GetAngle()) * acceration_force, Math.cos(sm.human_controlled_car.front_axle.GetAngle()) * acceration_force), sm.human_controlled_car.front_axle.GetWorldCenter());
+        }
+        var torque = 0.3;
+        if (cursors.left.isDown) {
+            sm.human_controlled_car.front_axle_joint.SetMotorSpeed(-torque);
+        }
+        else if (cursors.right.isDown) {
+            sm.human_controlled_car.front_axle_joint.SetMotorSpeed(torque);
+        }
+        else {
+            if (sm.human_controlled_car.front_axle_joint.GetJointAngle() != 0) {
+                if (sm.human_controlled_car.front_axle_joint.GetJointAngle() > 0)
+                    sm.human_controlled_car.front_axle_joint.SetMotorSpeed(-torque);
+                else
+                    sm.human_controlled_car.front_axle_joint.SetMotorSpeed(torque);
+            }
+        }
+    }
 }
 function add_car_to_world(model, car) {
     car.creation_timestamp = Date.now();
@@ -954,7 +1066,7 @@ function create_car(model) {
     };
 }
 function step_car(model, car, delta) {
-    car.lsv, car.csv, car.rsv = 0, 0, 0;
+    car.lsv = 0, car.csv = 0, car.rsv = 0;
     var ray_left_p1 = new Vec2((car.left_sensor_bottom_view.getWorldTransformMatrix().e) / SCALE, (car.left_sensor_bottom_view.getWorldTransformMatrix().f) / SCALE);
     var ray_left_p2 = new Vec2((car.left_sensor_top_view.getWorldTransformMatrix().e) / SCALE, (car.left_sensor_top_view.getWorldTransformMatrix().f) / SCALE);
     var ray_right_p1 = new Vec2((car.right_sensor_bottom_view.getWorldTransformMatrix().e) / SCALE, (car.right_sensor_bottom_view.getWorldTransformMatrix().f) / SCALE);
@@ -969,21 +1081,21 @@ function step_car(model, car, delta) {
         // console.log(f.GetUserData(), fr);
         var type = JSON.parse(f.GetUserData())["type"];
         if (type == "track") {
-            car.lsv = Math.round((1 - fr) * 100) / 100;
+            car.lsv = 1 - fr;
         }
         return 0;
     }, ray_left_p1, ray_left_p2);
     model.world.RayCast(function (f, p, n, fr) {
         var type = JSON.parse(f.GetUserData())["type"];
         if (type == "track") {
-            car.rsv = Math.round((1 - fr) * 100) / 100;
+            car.rsv = 1 - fr;
         }
         return 0;
     }, ray_right_p1, ray_right_p2);
     model.world.RayCast(function (f, p, n, fr) {
         var type = JSON.parse(f.GetUserData())["type"];
         if (type == "track") {
-            car.csv = Math.round((1 - fr) * 100) / 100;
+            car.csv = 1 - fr;
         }
         return 0;
     }, ray_center_p1, ray_center_p2);
@@ -1043,24 +1155,25 @@ function step_car(model, car, delta) {
     // 	);
     // } else {
     // }
-    car.front_axle.ApplyForce(new Vec2(Math.sin(car.front_axle.GetAngle()) * output[0][0] * acceration_force * delta, -Math.cos(car.front_axle.GetAngle()) * output[0][0] * acceration_force * delta), car.front_axle.GetWorldCenter());
-    // steering
-    var steering = (0.9 - output_non_activated[0][1]);
-    var torque = 50;
-    // if (cursors.left.isDown) {
-    // 	front_axle_joint.SetMotorSpeed(-torque);
-    // } else if (cursors.right.isDown) {
-    // 	front_axle_joint.SetMotorSpeed(torque);
-    // } else if (output_non_activated[0][1] == 0) {
-    // 	if (front_axle_joint.GetJointAngle() != 0) {
-    // 		if (front_axle_joint.GetJointAngle() > 0)
-    // 			front_axle_joint.SetMotorSpeed(-torque);
-    // 		else
-    // 			front_axle_joint.SetMotorSpeed(torque);
-    // 	}
-    // }
-    // car.front_axle.ApplyTorque(steering * torque * delta);
-    car.front_axle_joint.SetMotorSpeed(torque * steering * delta);
+    if (model.human_controlled_car === undefined || model.human_controlled_car.user_data != car.user_data) {
+        car.front_axle.ApplyForce(new Vec2(Math.sin(car.front_axle.GetAngle()) * output[0][0] * acceration_force * delta, -Math.cos(car.front_axle.GetAngle()) * output[0][0] * acceration_force * delta), car.front_axle.GetWorldCenter());
+        // steering
+        var steering = (0.9 - output_non_activated[0][1]);
+        var torque = 500;
+        // if (cursors.left.isDown) {
+        // 	front_axle_joint.SetMotorSpeed(-torque);
+        // } else if (cursors.right.isDown) {
+        // 	front_axle_joint.SetMotorSpeed(torque);
+        // } else if (output_non_activated[0][1] == 0) {
+        // 	if (front_axle_joint.GetJointAngle() != 0) {
+        // 		if (front_axle_joint.GetJointAngle() > 0)
+        // 			front_axle_joint.SetMotorSpeed(-torque);
+        // 		else
+        // 			front_axle_joint.SetMotorSpeed(torque);
+        // 	}
+        // }
+        car.front_axle_joint.SetMotorSpeed(torque * steering * delta);
+    }
     return car;
 }
 function add_car_to_simulation(model, car) {
@@ -1078,9 +1191,9 @@ function remove_car_from_scene(car) {
     car.ray_left_view.destroy();
     car.ray_center_view.destroy();
     car.ray_right_view.destroy();
+    car.destroyed = true;
 }
 function mark_car_for_destruction(car) {
-    car.destroyed = true;
     var already_marked = false;
     dq.queue.forEach(function (subject) {
         if (subject.user_data == car.user_data) {
@@ -1092,34 +1205,33 @@ function mark_car_for_destruction(car) {
         dq.queue.push(car);
     }
 }
-function clone_road_track_model(model) {
-    return {
-        h: model.h,
-        w: model.w,
-        relative_position: model.relative_position,
-        scene: model.scene,
-        world: model.world
-    };
-}
+// function clone_road_track_model(model: RoadTrackModel): RoadTrackModel {
+// 	return {
+// 		h: model.h,
+// 		w: model.w,
+// 		relative_position: model.relative_position,
+// 		scene: model.scene,
+// 		world: model.world
+// 	};
+// }
 function add_road_track_segment(model, position, angle) {
-    var new_model = clone_road_track_model(model);
-    new_model.relative_position[0] += position[0];
-    new_model.relative_position[1] += position[1];
+    model.relative_position[0] += position[0];
+    model.relative_position[1] += position[1];
     var segment_def = new box2d.b2BodyDef();
-    segment_def.position = new Vec2(new_model.relative_position[0] / SCALE, new_model.relative_position[1] / SCALE);
+    segment_def.position = new Vec2(model.relative_position[0] / SCALE, model.relative_position[1] / SCALE);
     segment_def.angle = angle;
     var segment = model.world.CreateBody(segment_def);
     var segment_fix_def = new box2d.b2FixtureDef();
     segment_fix_def.shape = new box2d.b2PolygonShape();
-    segment_fix_def.shape.SetAsBox(new_model.w / SCALE, new_model.h / SCALE);
+    segment_fix_def.shape.SetAsBox(model.w / SCALE, model.h / SCALE);
     segment_fix_def.density = 1;
     segment_fix_def.userData = '{ "type": "track" }';
     segment_fix_def.filter.categoryBits = category.track;
     segment_fix_def.filter.maskBits = mask.track;
     segment.CreateFixture(segment_fix_def);
-    var rectangle = new_model.scene.add.rectangle(new_model.relative_position[0], new_model.relative_position[1], new_model.w * 2, new_model.h * 2, 0x007bff);
-    rectangle.angle = angle * (180 / Math.PI);
-    new_model.relative_position[0] -= new_model.w * 2;
-    new_model.relative_position[1] -= new_model.h * 2;
-    return new_model;
+    var rectangle = model.scene.add.rectangle(model.relative_position[0], model.relative_position[1], model.w * 2, model.h * 2, 0x007bff);
+    rectangle.rotation = angle;
+    // model.relative_position[0] -= model.w;
+    model.relative_position[1] -= model.h * 2;
+    return model;
 }

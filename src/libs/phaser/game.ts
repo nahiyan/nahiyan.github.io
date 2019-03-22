@@ -26,6 +26,8 @@ interface SimulationModel {
     layer_sizes: number[];
     world: any;
     scene: any;
+    paused: boolean;
+    human_controlled_car?: Car;
 }
 
 interface Category {
@@ -66,3 +68,21 @@ let furthest_car: Car;
 let distance_text: any;
 let speed_text: any;
 let current_generation_text: any;
+let best_fit_car_sensors_text: any;
+
+document.addEventListener("keyup", function(e) {
+    if (e.keyCode == 32)
+        if (sm.paused) {
+            sm.scene.scene.resume();
+            sm.paused = false;
+        } else {
+            sm.scene.scene.pause();
+            sm.paused = true;
+        }
+    else if (e.key == 'h' || e.key == 'H')
+        if (sm.human_controlled_car === undefined || sm.human_controlled_car.destroyed) {
+            sm.human_controlled_car = furthest_car;
+        } else {
+            sm.human_controlled_car = undefined;
+        }
+});

@@ -1,11 +1,14 @@
 function update (time, delta) {
+	if (furthest_car.destroyed)
+		furthest_car.total_distance = 0;
+
 	let lg: Generation = last_generation(sm);
 
 	// get rid of really slow cars
 
 	if ((Date.now() - lg.time) / 1000 > 2) {
 		lg.cars.forEach(function(car: Car) {
-			if (car.speed < 0.2)
+			if (car.speed < 0.2 && !car.destroyed && sm.human_controlled_car !== undefined && car.user_data != sm.human_controlled_car.user_data)
 				mark_car_for_destruction(car);
 		});
 	}
@@ -15,12 +18,14 @@ function update (time, delta) {
 
 	if (len(dq.queue) != 0) {
 		dq.queue.forEach(function(car: Car) {
-			remove_car_from_world(sm, car);
-			remove_car_from_scene(car);
+			if (!car.destroyed) {
+				remove_car_from_world(sm, car);
+				remove_car_from_scene(car);
 
-			const time: number = (Date.now() - car.creation_timestamp) / 1000;
+				const time: number = (Date.now() - car.creation_timestamp) / 1000;
 
-			car.fitness = fitness(car.total_distance, car.total_distance / time);
+				car.fitness = fitness(car.total_distance, car.total_distance / time);
+			}
 		});
 		dq.queue = [];
 	}
@@ -61,11 +66,12 @@ function update (time, delta) {
 	// cars step
 
 	lg.cars.forEach(function(car: Car) {
-		if (car.total_distance > furthest_car.total_distance)
-			furthest_car = car;
-
-		if (!car.destroyed)
+		if (!car.destroyed) {
 			step_car(sm, car, delta);
+
+			if (car.total_distance > furthest_car.total_distance)
+				furthest_car = car;
+		}
 	});
 
 	// camera
@@ -80,6 +86,48 @@ function update (time, delta) {
 	speed_text.setText("Speed: " + Math.round(furthest_car.speed * 100) / 100);
 	speed_text.setPosition(this.cameras.main.scrollX + 10, this.cameras.main.scrollY + 40);
 
-	current_generation_text.setText("Generation: " + sm.current_generation_index);
+	current_generation_text.setText("Generation: " + (sm.current_generation_index + 1));
 	current_generation_text.setPosition(this.cameras.main.scrollX + 10, this.cameras.main.scrollY + 60);
+
+	best_fit_car_sensors_text.setText("Sensors: " + Math.round(furthest_car.lsv * 100) / 100 + ", " + Math.round(furthest_car.csv * 100) / 100 + ", " + Math.round(furthest_car.rsv * 100) / 100);
+	best_fit_car_sensors_text.setPosition(this.cameras.main.scrollX + 10, this.cameras.main.scrollY + 80);
+
+	// keyboard controls
+
+	const acceration_force: number = 1000;
+
+	if (sm.human_controlled_car !== undefined) {
+		if (cursors.up.isDown) {
+			sm.human_controlled_car.front_axle.ApplyForce(
+				new Vec2(
+					Math.sin(sm.human_controlled_car.front_axle.GetAngle()) * acceration_force,
+					-Math.cos(sm.human_controlled_car.front_axle.GetAngle()) * acceration_force
+				),
+				sm.human_controlled_car.front_axle.GetWorldCenter()
+			);
+		} else if (cursors.down.isDown) {
+			sm.human_controlled_car.front_axle.ApplyForce(
+				new Vec2(
+					-Math.sin(sm.human_controlled_car.front_axle.GetAngle()) * acceration_force,
+					Math.cos(sm.human_controlled_car.front_axle.GetAngle()) * acceration_force
+				),
+				sm.human_controlled_car.front_axle.GetWorldCenter()
+			);
+		}
+
+		let torque: number = 0.3;
+
+		if (cursors.left.isDown) {
+			sm.human_controlled_car.front_axle_joint.SetMotorSpeed(-torque);
+		} else if (cursors.right.isDown) {
+			sm.human_controlled_car.front_axle_joint.SetMotorSpeed(torque);
+		} else {
+			if (sm.human_controlled_car.front_axle_joint.GetJointAngle() != 0) {
+				if (sm.human_controlled_car.front_axle_joint.GetJointAngle() > 0)
+					sm.human_controlled_car.front_axle_joint.SetMotorSpeed(-torque);
+				else
+					sm.human_controlled_car.front_axle_joint.SetMotorSpeed(torque);
+			}
+		}
+	}
 }

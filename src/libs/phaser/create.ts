@@ -10,6 +10,7 @@ function create() {
 	distance_text = this.add.text(5, 20, "Distance: 0");
 	speed_text = this.add.text(5, 50, "Speed: 0");
 	current_generation_text = this.add.text(5, 70, "Generation: 0");
+	best_fit_car_sensors_text = this.add.text(5, 90, "Sensors: 0");
 
 	// TODO: add initial generation
 

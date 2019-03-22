@@ -400,7 +400,7 @@ function create_car(model: SimulationModel): Car {
 }
 
 function step_car(model: SimulationModel, car: Car, delta: number): Car {
-	car.lsv, car.csv, car.rsv = 0, 0, 0;
+	car.lsv = 0, car.csv = 0, car.rsv = 0;
 
 	let ray_left_p1 =
 		new Vec2(
@@ -454,7 +454,7 @@ function step_car(model: SimulationModel, car: Car, delta: number): Car {
 			const type: string = JSON.parse(f.GetUserData())["type"];
 
 			if (type == "track") {
-				car.lsv = Math.round((1 - fr) * 100) / 100;
+					car.lsv = 1 - fr;
 			}
 			
 			return 0;
@@ -467,7 +467,7 @@ function step_car(model: SimulationModel, car: Car, delta: number): Car {
 			const type: string = JSON.parse(f.GetUserData())["type"];
 
 			if (type == "track") {
-				car.rsv = Math.round((1 - fr) * 100) / 100;
+				car.rsv = 1 - fr;
 			}
 			
 			return 0;
@@ -480,7 +480,7 @@ function step_car(model: SimulationModel, car: Car, delta: number): Car {
 			const type: string = JSON.parse(f.GetUserData())["type"];
 
 			if (type == "track") {
-				car.csv = Math.round((1 - fr) * 100) / 100;
+				car.csv = 1 - fr;
 			}
 			
 			return 0;
@@ -573,36 +573,36 @@ function step_car(model: SimulationModel, car: Car, delta: number): Car {
 		
 	// }
 
-	car.front_axle.ApplyForce(
-			new Vec2(
-				Math.sin(car.front_axle.GetAngle()) * output[0][0] * acceration_force * delta,
-				-Math.cos(car.front_axle.GetAngle()) * output[0][0] * acceration_force * delta
-			),
-			car.front_axle.GetWorldCenter()
-		);
+	if (model.human_controlled_car === undefined || model.human_controlled_car.user_data != car.user_data) {
+		car.front_axle.ApplyForce(
+				new Vec2(
+					Math.sin(car.front_axle.GetAngle()) * output[0][0] * acceration_force * delta,
+					-Math.cos(car.front_axle.GetAngle()) * output[0][0] * acceration_force * delta
+				),
+				car.front_axle.GetWorldCenter()
+			);
 
-	// steering
+		// steering
 
-	let steering: number = (0.9 - output_non_activated[0][1]);
+		let steering: number = (0.9 - output_non_activated[0][1]);
 
-	let torque: number = 50;
+		let torque: number = 500;
 
-	// if (cursors.left.isDown) {
-	// 	front_axle_joint.SetMotorSpeed(-torque);
-	// } else if (cursors.right.isDown) {
-	// 	front_axle_joint.SetMotorSpeed(torque);
-	// } else if (output_non_activated[0][1] == 0) {
-	// 	if (front_axle_joint.GetJointAngle() != 0) {
-	// 		if (front_axle_joint.GetJointAngle() > 0)
-	// 			front_axle_joint.SetMotorSpeed(-torque);
-	// 		else
-	// 			front_axle_joint.SetMotorSpeed(torque);
-	// 	}
-	// }
+		// if (cursors.left.isDown) {
+		// 	front_axle_joint.SetMotorSpeed(-torque);
+		// } else if (cursors.right.isDown) {
+		// 	front_axle_joint.SetMotorSpeed(torque);
+		// } else if (output_non_activated[0][1] == 0) {
+		// 	if (front_axle_joint.GetJointAngle() != 0) {
+		// 		if (front_axle_joint.GetJointAngle() > 0)
+		// 			front_axle_joint.SetMotorSpeed(-torque);
+		// 		else
+		// 			front_axle_joint.SetMotorSpeed(torque);
+		// 	}
+		// }
 
-	// car.front_axle.ApplyTorque(steering * torque * delta);
-
-	car.front_axle_joint.SetMotorSpeed(torque * steering * delta);
+		car.front_axle_joint.SetMotorSpeed(torque * steering * delta);
+	}
 
 	return car;
 }
@@ -625,11 +625,11 @@ function remove_car_from_scene(car: Car): void {
 	car.ray_left_view.destroy();
 	car.ray_center_view.destroy();
 	car.ray_right_view.destroy();
+
+	car.destroyed = true;
 }
 
 function mark_car_for_destruction(car: Car): void {
-	car.destroyed = true;
-
 	let already_marked: boolean = false;
 
 	dq.queue.forEach(function(subject: Car) {

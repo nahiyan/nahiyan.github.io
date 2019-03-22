@@ -16,7 +16,9 @@ function clone_sm(model: SimulationModel): SimulationModel {
         population_size: model.population_size,
         layer_sizes: model.layer_sizes,
         world: model.world,
-        scene: model.scene
+        scene: model.scene,
+        paused: model.paused,
+        human_controlled_car: model.human_controlled_car,
     };
 }
 
@@ -111,6 +113,10 @@ function len(array): number {
 // }
 
 declare var nj: any;
+
+function rand_int(min: number, max: number): number {
+    return Math.floor(Math.random() * max) + min;  
+}
 
 function random(min, max) {
     return Math.random() * (max - min) + min;
