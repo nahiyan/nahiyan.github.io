@@ -149,7 +149,7 @@ function last_non_activated_layer(model: NeuralNetworkModel): any {
     var last_non_activated_layer = [];
     let i: any;
     for (i in range(number_of_layers(model)))
-        last_non_activated_layer.push(layer(i, model));
+        last_non_activated_layer.push(non_activated_layer(i, model));
 
     return nj.array(non_activated_layer(output_layer_index, model)).tolist();
 }

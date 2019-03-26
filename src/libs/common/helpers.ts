@@ -19,6 +19,7 @@ function clone_sm(model: SimulationModel): SimulationModel {
         scene: model.scene,
         paused: model.paused,
         human_controlled_car: model.human_controlled_car,
+        show_sensors: model.show_sensors,
     };
 }
 

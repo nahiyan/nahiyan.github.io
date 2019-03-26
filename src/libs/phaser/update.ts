@@ -59,7 +59,7 @@ function update (time, delta) {
 
 	// box2d step
 
-	sm.world.Step(1 / 30, 10, 10);
+	sm.world.Step(1 / 10, 10, 10);
 	// sm.world.DrawDebugData();
 	sm.world.ClearForces();
 

@@ -9,7 +9,7 @@ var config: object = {
         create: create,
         update: update
     },
-    fps: 30
+    fps: 10
 };
 
 let PVec2: any = Phaser.Math.Vector2;
@@ -28,6 +28,7 @@ interface SimulationModel {
     scene: any;
     paused: boolean;
     human_controlled_car?: Car;
+    show_sensors: boolean;
 }
 
 interface Category {

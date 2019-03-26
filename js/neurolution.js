@@ -54,7 +54,8 @@ function clone_sm(model) {
         world: model.world,
         scene: model.scene,
         paused: model.paused,
-        human_controlled_car: model.human_controlled_car
+        human_controlled_car: model.human_controlled_car,
+        show_sensors: model.show_sensors
     };
 }
 function range(size, startAt) {
@@ -329,7 +330,7 @@ function last_non_activated_layer(model) {
     var last_non_activated_layer = [];
     var i;
     for (i in range(number_of_layers(model)))
-        last_non_activated_layer.push(layer(i, model));
+        last_non_activated_layer.push(non_activated_layer(i, model));
     return nj.array(non_activated_layer(output_layer_index, model)).tolist();
 }
 // imperative
@@ -723,7 +724,7 @@ var config = {
         create: create,
         update: update
     },
-    fps: 30
+    fps: 10
 };
 var PVec2 = Phaser.Math.Vector2;
 var sm;
@@ -787,12 +788,13 @@ function preload() {
     sm = {
         generations: [],
         current_generation_index: 0,
-        population_size: 100,
+        population_size: 50,
         layer_sizes: [3, 5, 3, 2],
         world: prepare_world(this),
         scene: this,
         paused: false,
-        human_controlled_car: undefined
+        human_controlled_car: undefined,
+        show_sensors: false
     };
 }
 function update(time, delta) {
@@ -837,7 +839,7 @@ function update(time, delta) {
         furthest_car = lg.cars[0];
     }
     // box2d step
-    sm.world.Step(1 / 30, 10, 10);
+    sm.world.Step(1 / 10, 10, 10);
     // sm.world.DrawDebugData();
     sm.world.ClearForces();
     // cars step
@@ -1008,9 +1010,14 @@ function add_car_to_scene(model, car) {
     var car_view = new Phaser.GameObjects.Image(model.scene, 0, 0, 'car');
     car_view.setScale(0.5);
     car_container.add(car_view);
-    var ray_left_view = model.scene.add.line(0, 0, 0, 0, 0, 0, 0xffffff);
-    var ray_right_view = model.scene.add.line(0, 0, 0, 0, 0, 0, 0xffffff);
-    var ray_center_view = model.scene.add.line(0, 0, 0, 0, 0, 0, 0xffffff);
+    var ray_left_view;
+    var ray_right_view;
+    var ray_center_view;
+    if (sm.show_sensors) {
+        ray_left_view = model.scene.add.line(0, 0, 0, 0, 0, 0, 0xffffff);
+        ray_right_view = model.scene.add.line(0, 0, 0, 0, 0, 0, 0xffffff);
+        ray_center_view = model.scene.add.line(0, 0, 0, 0, 0, 0, 0xffffff);
+    }
     var left_sensor_bottom_view = new Phaser.GameObjects.Rectangle(model.scene, -20, -57, 0, 0, 0x0000ff);
     left_sensor_bottom_view.setAngle(-32);
     car_container.add(left_sensor_bottom_view);
@@ -1032,9 +1039,11 @@ function add_car_to_scene(model, car) {
     car.car_container = car_container;
     car.front_axle_view = front_axle_view;
     car.rear_axle_view = rear_axle_view;
-    car.ray_left_view = ray_left_view;
-    car.ray_center_view = ray_center_view;
-    car.ray_right_view = ray_right_view;
+    if (sm.show_sensors) {
+        car.ray_left_view = ray_left_view;
+        car.ray_center_view = ray_center_view;
+        car.ray_right_view = ray_right_view;
+    }
     car.previous_position = [car_container.x, car_container.y];
     car.total_distance = 0;
     car.left_sensor_bottom_view = left_sensor_bottom_view;
@@ -1073,9 +1082,11 @@ function step_car(model, car, delta) {
     var ray_right_p2 = new Vec2((car.right_sensor_top_view.getWorldTransformMatrix().e) / SCALE, (car.right_sensor_top_view.getWorldTransformMatrix().f) / SCALE);
     var ray_center_p1 = new Vec2((car.center_sensor_bottom_view.getWorldTransformMatrix().e) / SCALE, (car.center_sensor_bottom_view.getWorldTransformMatrix().f) / SCALE);
     var ray_center_p2 = new Vec2((car.center_sensor_top_view.getWorldTransformMatrix().e) / SCALE, (car.center_sensor_top_view.getWorldTransformMatrix().f) / SCALE);
-    car.ray_left_view.setTo(ray_left_p1.x * SCALE, ray_left_p1.y * SCALE, ray_left_p2.x * SCALE, ray_left_p2.y * SCALE);
-    car.ray_right_view.setTo(ray_right_p1.x * SCALE, ray_right_p1.y * SCALE, ray_right_p2.x * SCALE, ray_right_p2.y * SCALE);
-    car.ray_center_view.setTo(ray_center_p1.x * SCALE, ray_center_p1.y * SCALE, ray_center_p2.x * SCALE, ray_center_p2.y * SCALE);
+    if (sm.show_sensors) {
+        car.ray_left_view.setTo(ray_left_p1.x * SCALE, ray_left_p1.y * SCALE, ray_left_p2.x * SCALE, ray_left_p2.y * SCALE);
+        car.ray_right_view.setTo(ray_right_p1.x * SCALE, ray_right_p1.y * SCALE, ray_right_p2.x * SCALE, ray_right_p2.y * SCALE);
+        car.ray_center_view.setTo(ray_center_p1.x * SCALE, ray_center_p1.y * SCALE, ray_center_p2.x * SCALE, ray_center_p2.y * SCALE);
+    }
     // raycast
     model.world.RayCast(function (f, p, n, fr) {
         // console.log(f.GetUserData(), fr);
@@ -1099,18 +1110,20 @@ function step_car(model, car, delta) {
         }
         return 0;
     }, ray_center_p1, ray_center_p2);
-    if (car.lsv == 0)
-        car.ray_left_view.strokeColor = 0x00ff00;
-    else
-        car.ray_left_view.strokeColor = 0xff0000;
-    if (car.rsv == 0)
-        car.ray_right_view.strokeColor = 0x00ff00;
-    else
-        car.ray_right_view.strokeColor = 0xff0000;
-    if (car.csv == 0)
-        car.ray_center_view.strokeColor = 0x00ff00;
-    else
-        car.ray_center_view.strokeColor = 0xff0000;
+    if (sm.show_sensors) {
+        if (car.lsv == 0)
+            car.ray_left_view.strokeColor = 0x00ff00;
+        else
+            car.ray_left_view.strokeColor = 0xff0000;
+        if (car.rsv == 0)
+            car.ray_right_view.strokeColor = 0x00ff00;
+        else
+            car.ray_right_view.strokeColor = 0xff0000;
+        if (car.csv == 0)
+            car.ray_center_view.strokeColor = 0x00ff00;
+        else
+            car.ray_center_view.strokeColor = 0xff0000;
+    }
     car.speed =
         Math.round(((Phaser.Math.Distance.Between(car.previous_position[0], car.previous_position[1], car.car_container.x, car.car_container.y) / (delta / 1000)) / SCALE) * 10) / 10;
     car.total_distance += Phaser.Math.Distance.Between(car.previous_position[0], car.previous_position[1], car.car_container.x, car.car_container.y) / SCALE;
@@ -1158,8 +1171,9 @@ function step_car(model, car, delta) {
     if (model.human_controlled_car === undefined || model.human_controlled_car.user_data != car.user_data) {
         car.front_axle.ApplyForce(new Vec2(Math.sin(car.front_axle.GetAngle()) * output[0][0] * acceration_force * delta, -Math.cos(car.front_axle.GetAngle()) * output[0][0] * acceration_force * delta), car.front_axle.GetWorldCenter());
         // steering
-        var steering = (0.9 - output_non_activated[0][1]);
-        var torque = 500;
+        // console.log(output_non_activated[0][1], output[0][1]);
+        var steering = (0.8 - output_non_activated[0][1]);
+        var torque = 50;
         // if (cursors.left.isDown) {
         // 	front_axle_joint.SetMotorSpeed(-torque);
         // } else if (cursors.right.isDown) {
@@ -1188,9 +1202,11 @@ function remove_car_from_world(model, car) {
 }
 function remove_car_from_scene(car) {
     car.car_container.destroy();
-    car.ray_left_view.destroy();
-    car.ray_center_view.destroy();
-    car.ray_right_view.destroy();
+    if (sm.show_sensors) {
+        car.ray_left_view.destroy();
+        car.ray_center_view.destroy();
+        car.ray_right_view.destroy();
+    }
     car.destroyed = true;
 }
 function mark_car_for_destruction(car) {

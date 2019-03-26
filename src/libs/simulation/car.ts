@@ -285,9 +285,15 @@ function add_car_to_scene(model: SimulationModel, car: Car): void {
 
 	car_container.add(car_view);
 
-	let ray_left_view: any = model.scene.add.line(0, 0, 0, 0, 0, 0, 0xffffff);
-	let ray_right_view: any = model.scene.add.line(0, 0, 0, 0, 0, 0, 0xffffff);
-	let ray_center_view: any = model.scene.add.line(0, 0, 0, 0, 0, 0, 0xffffff);
+	let ray_left_view: any;
+	let ray_right_view: any;
+	let ray_center_view: any;
+	
+	if (sm.show_sensors) {
+		ray_left_view = model.scene.add.line(0, 0, 0, 0, 0, 0, 0xffffff);
+		ray_right_view = model.scene.add.line(0, 0, 0, 0, 0, 0, 0xffffff);
+		ray_center_view = model.scene.add.line(0, 0, 0, 0, 0, 0, 0xffffff);
+	}
 
 	let left_sensor_bottom_view: any = new Phaser.GameObjects.Rectangle(
 		model.scene,
@@ -361,9 +367,11 @@ function add_car_to_scene(model: SimulationModel, car: Car): void {
 	car.front_axle_view = front_axle_view;
 	car.rear_axle_view = rear_axle_view;
 
-	car.ray_left_view = ray_left_view;
-	car.ray_center_view = ray_center_view;
-	car.ray_right_view = ray_right_view;
+	if (sm.show_sensors) {
+		car.ray_left_view = ray_left_view;
+		car.ray_center_view = ray_center_view;
+		car.ray_right_view = ray_right_view;
+	}
 
 	car.previous_position = [car_container.x, car_container.y];
 	car.total_distance = 0;
@@ -429,23 +437,25 @@ function step_car(model: SimulationModel, car: Car, delta: number): Car {
 			(car.center_sensor_top_view.getWorldTransformMatrix().e) / SCALE,
 			(car.center_sensor_top_view.getWorldTransformMatrix().f) / SCALE);
 
-	car.ray_left_view.setTo(
-		ray_left_p1.x * SCALE,
-		ray_left_p1.y * SCALE,
-		ray_left_p2.x * SCALE,
-		ray_left_p2.y * SCALE);
+	if (sm.show_sensors) {
+		car.ray_left_view.setTo(
+			ray_left_p1.x * SCALE,
+			ray_left_p1.y * SCALE,
+			ray_left_p2.x * SCALE,
+			ray_left_p2.y * SCALE);
 
-	car.ray_right_view.setTo(
-		ray_right_p1.x * SCALE,
-		ray_right_p1.y * SCALE,
-		ray_right_p2.x * SCALE,
-		ray_right_p2.y * SCALE);
+		car.ray_right_view.setTo(
+			ray_right_p1.x * SCALE,
+			ray_right_p1.y * SCALE,
+			ray_right_p2.x * SCALE,
+			ray_right_p2.y * SCALE);
 
-	car.ray_center_view.setTo(
-		ray_center_p1.x * SCALE,
-		ray_center_p1.y * SCALE,
-		ray_center_p2.x * SCALE,
-		ray_center_p2.y * SCALE);
+		car.ray_center_view.setTo(
+			ray_center_p1.x * SCALE,
+			ray_center_p1.y * SCALE,
+			ray_center_p2.x * SCALE,
+			ray_center_p2.y * SCALE);
+	}
 
 	// raycast
 	model.world.RayCast(
@@ -488,20 +498,22 @@ function step_car(model: SimulationModel, car: Car, delta: number): Car {
 		ray_center_p1,
 		ray_center_p2);
 
-	if (car.lsv == 0)
-		car.ray_left_view.strokeColor = 0x00ff00;
-	else
-		car.ray_left_view.strokeColor = 0xff0000;
+	if (sm.show_sensors) {
+		if (car.lsv == 0)
+			car.ray_left_view.strokeColor = 0x00ff00;
+		else
+			car.ray_left_view.strokeColor = 0xff0000;
 
-	if (car.rsv == 0)
-		car.ray_right_view.strokeColor = 0x00ff00;
-	else
-		car.ray_right_view.strokeColor = 0xff0000;
+		if (car.rsv == 0)
+			car.ray_right_view.strokeColor = 0x00ff00;
+		else
+			car.ray_right_view.strokeColor = 0xff0000;
 
-	if (car.csv == 0)
-		car.ray_center_view.strokeColor = 0x00ff00;
-	else
-		car.ray_center_view.strokeColor = 0xff0000;
+		if (car.csv == 0)
+			car.ray_center_view.strokeColor = 0x00ff00;
+		else
+			car.ray_center_view.strokeColor = 0xff0000;
+	}
 
 	car.speed =
 		Math.round(
@@ -584,9 +596,11 @@ function step_car(model: SimulationModel, car: Car, delta: number): Car {
 
 		// steering
 
-		let steering: number = (0.9 - output_non_activated[0][1]);
+		// console.log(output_non_activated[0][1], output[0][1]);
 
-		let torque: number = 500;
+		let steering: number = (0.8 - output_non_activated[0][1]);
+
+		let torque: number = 50;
 
 		// if (cursors.left.isDown) {
 		// 	front_axle_joint.SetMotorSpeed(-torque);
@@ -622,9 +636,12 @@ function remove_car_from_world(model: SimulationModel, car: Car): void {
 
 function remove_car_from_scene(car: Car): void {
 	car.car_container.destroy();
-	car.ray_left_view.destroy();
-	car.ray_center_view.destroy();
-	car.ray_right_view.destroy();
+
+	if (sm.show_sensors) {
+		car.ray_left_view.destroy();
+		car.ray_center_view.destroy();
+		car.ray_right_view.destroy();
+	}
 
 	car.destroyed = true;
 }
