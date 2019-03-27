@@ -9,90 +9,90 @@ interface NeuralNetworkModel {
 
 // imperative
 
-function random_weights(layer_sizes: number[]): any {
-    let weights: any = [];
-    let i: any;
-    for (i in range(len(layer_sizes))) {
-        // skip the first layer, as it has no previous layer
-        if(i != 0) {
-            weights.push(
-                nj.random(
-                    layer_sizes[i - 1], layer_sizes[i]).tolist());
-        }
-    }
-
-    return weights;
-}
-
 // function random_weights(layer_sizes: number[]): any {
 //     let weights: any = [];
-
-//     const normal_dist = gaussian(0, 1);
-    
 //     let i: any;
 //     for (i in range(len(layer_sizes))) {
 //         // skip the first layer, as it has no previous layer
 //         if(i != 0) {
-//             const r: number[] = range(layer_sizes[i - 1]);
-//             const c: number[] = range(layer_sizes[i]);
-
-//             weights.push([]);
-
-//             r.forEach(function(i: number) {
-//                 let rows: number[] = [];
-//                 c.forEach(function(j: number) {
-//                     rows.push(normal_dist());
-//                 });
-
-//                 weights[len(weights) - 1].push(rows);
-//             });
+//             weights.push(
+//                 nj.random(
+//                     layer_sizes[i - 1], layer_sizes[i]).tolist());
 //         }
 //     }
 
 //     return weights;
 // }
 
-// function random_biases(layer_sizes: number[]): any {
-//     let biases: any = [];
+function random_weights(layer_sizes: number[]): any {
+    let weights: any = [];
 
-//     const normal_dist = gaussian(0, 1);
+    // const normal_dist = gaussian(0, 1);
     
-//     let i: any;
-//     for (i in range(len(layer_sizes))) {
-//         // skip the first layer, as it has no previous layer
-//         if(i != 0) {
-//             const r: number[] = range(1);
-//             const c: number[] = range(layer_sizes[i]);
+    let i: any;
+    for (i in range(len(layer_sizes))) {
+        // skip the first layer, as it has no previous layer
+        if(i != 0) {
+            const r: number[] = range(layer_sizes[i - 1]);
+            const c: number[] = range(layer_sizes[i]);
 
-//             biases.push([]);
+            weights.push([]);
 
-//             r.forEach(function(i: number) {
-//                 let rows: number[] = [];
-//                 c.forEach(function(j: number) {
-//                     rows.push(normal_dist());
-//                 });
+            r.forEach(function(i: number) {
+                let rows: number[] = [];
+                c.forEach(function(j: number) {
+                    rows.push(random(-1, 1));
+                });
 
-//                 biases[len(biases) - 1].push(rows);
-//             });
-//         }
-//     }
+                weights[len(weights) - 1].push(rows);
+            });
+        }
+    }
 
-//     return biases;
-// }
+    return weights;
+}
 
 function random_biases(layer_sizes: number[]): any {
     let biases: any = [];
 
+    // const normal_dist = gaussian(0, 1);
+    
     let i: any;
     for (i in range(len(layer_sizes))) {
         // skip the first layer, as it has no previous layer
-        if(i != 0)
-            biases.push(
-                nj.random(1, layer_sizes[i]).tolist());
+        if(i != 0) {
+            const r: number[] = range(1);
+            const c: number[] = range(layer_sizes[i]);
+
+            biases.push([]);
+
+            r.forEach(function(i: number) {
+                let rows: number[] = [];
+                c.forEach(function(j: number) {
+                    rows.push(random(-1, 1));
+                });
+
+                biases[len(biases) - 1].push(rows);
+            });
+        }
     }
 
     return biases;
 }
+
+// function random_biases(layer_sizes: number[]): any {
+//     let biases: any = [];
+
+//     let i: any;
+//     for (i in range(len(layer_sizes))) {
+//         // skip the first layer, as it has no previous layer
+//         if(i != 0)
+//             biases.push(
+//                 nj.random(1, layer_sizes[i]).tolist());
+//     }
+
+//     return biases;
+// }
 
 // functional
 

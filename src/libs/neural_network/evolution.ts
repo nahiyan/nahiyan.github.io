@@ -80,7 +80,7 @@ function last_generation(model: SimulationModel): Generation {
 }
 
 function breed_generation(model: SimulationModel): SimulationModel {
-	const selection_count: number = 5;
+	const selection_count: number = 4;
 
 	// const selection_count: number = Math.ceil(0.1 * model.population_size);
 	const mutation_rate: number = 0.02;
@@ -102,25 +102,9 @@ function breed_generation(model: SimulationModel): SimulationModel {
 	// fill the new generation by crossovers
 
 	while (len(new_gen.cars) != model.population_size) {
-		// let random_nn_a: NeuralNetworkModel = 
-		// 	fittest_individuals[
-		// 		Math.floor(
-		// 			Math.random() * len(fittest_individuals))].nn;
-
-		// let random_nn_b: NeuralNetworkModel =
-		// 	fittest_individuals[
-		// 		Math.floor(
-		// 			Math.random() * len(fittest_individuals))].nn;
-
 		new_gen.cars.push(
 			crossover(model, fittest_individuals));
 	}
-
-	// mutate the neural networks
-
-	// for (var i = 0; i < len(new_gen); i++) {
-	// 	model.generations[len(model.generations) - 1][i] = mutate(model.generations[len(model.generations) - 1][i], mutation_rate);
-	// }
 
 	// mutate the newly formed generation
 
@@ -143,10 +127,6 @@ function crossover(model: SimulationModel, individuals: Car[]): Car {
 	let new_car: Car = create_car(model);
 
 	let x: number = 0;
-
-	// let size_x: number = len(new_car.nn.weights);
-	// let size_y: number = len(new_car.nn.weights[0]);
-	// let size_z: number = len(new_car.nn.weights[0][0]);
 
 	let individuals_count: number = len(individuals);
 
@@ -195,50 +175,6 @@ function crossover(model: SimulationModel, individuals: Car[]): Car {
 	});
 
 	return new_car;
-
-
-
-
-	// weights
-
-// 	let new_weights: any[] = [];
-
-// 	// i -> matrix representing weights between 2 layers
-
-// 	for (var i in range(len(parent_a.weights))) {
-// 		new_weights.push([]);
-
-// 		let size_y = len(parent_a.weights[i]);
-// 		let size_x = len(parent_a.weights[i][0]);
-
-// 		for (var j in range(size_y)) {
-// 			new_weights[i].push([]);
-
-// 			for (var k in range(size_x)) {
-// 				new_weights[i][j].push([]);
-
-// 				if (Math.round(random(0, 1)) == 0)
-// 					new_weights[i][j][k] = parent_a.weights[i][j][k];
-// 				else
-// 					new_weights[i][j][k] = parent_b.weights[i][j][k];
-// 			}
-// 		}
-// 	}
-
-// // 	// TODO: Biases
-
-// 	// child
-
-// 	let child: NeuralNetworkModel =  {
-// 		weights: new_weights,
-// 		biases: parent_a.biases,
-// 		layer_sizes: parent_a.layer_sizes,
-// 		layers: [],
-// 		identity_biases: undefined,
-// 		non_activated_layers: []
-// 	};
-
-// 	return child;
 }
 
 function best_fit_select(model: SimulationModel, quantity: number): Car[] {

@@ -51,7 +51,7 @@ function add_car_to_world(model: SimulationModel, car: Car): void {
 
 	let car_body_fix_def: any = new box2d.b2FixtureDef();
 	car_body_fix_def.shape = car_body_shape;
-	car_body_fix_def.density = 10;
+	car_body_fix_def.density = 1;
 	car_body_fix_def.userData = car.user_data;
 	car_body_fix_def.filter.categoryBits = category.car;
 	car_body_fix_def.filter.maskBits = mask.car;
@@ -59,8 +59,8 @@ function add_car_to_world(model: SimulationModel, car: Car): void {
 	let car_body_def: any = new box2d.b2BodyDef();
 	car_body_def.position = new Vec2(180 / SCALE, 300 / SCALE);
 	car_body_def.type = box2d.b2Body.b2_dynamicBody;
-	car_body_def.linearDamping = 10;
-	car_body_def.angularDamping = 10;
+	car_body_def.linearDamping = 1;
+	car_body_def.angularDamping = 3;
 
 	let car_body: any = model.world.CreateBody(car_body_def);
 	car_body.CreateFixture(car_body_fix_def);
@@ -541,16 +541,6 @@ function step_car(model: SimulationModel, car: Car, delta: number): Car {
 	let output: any = last_layer(forward_propagated_nn);
 	let output_non_activated: any = last_non_activated_layer(forward_propagated_nn);
 
-	// steering_text.setText("Output: " + Math.round(output[0][0] * 100) / 100 + ", " + Math.round(steering * 100) / 100);
-	// steering_text.setPosition(this.cameras.main.scrollX + 5, this.cameras.main.scrollY + 130);
-
-	// if (output[0][2] >= 0.5)
-	// 	acceleration = 1;
-
-	// console.log(output[0][0]);
-	// console.log(output[0][1]);
-	// console.log(output[0][2]);
-
 	// wheel views
 
 	car.front_axle_view.rotation = car.front_axle.GetAngle() - car.car_body.GetAngle();
@@ -563,29 +553,11 @@ function step_car(model: SimulationModel, car: Car, delta: number): Car {
 
 	// movement
 
-	let acceration_force: number = 20;
-
-	// if (cursors.up.isDown) {
-	// 	front_axle.ApplyForce(
-	// 		new Vec2(
-	// 			Math.sin(front_axle.GetAngle()) * acceration_force,
-	// 			-Math.cos(front_axle.GetAngle()) * acceration_force
-	// 		),
-	// 		front_axle.GetWorldCenter()
-	// 	);
-	// } else if (cursors.down.isDown) {
-	// 	front_axle.ApplyForce(
-	// 		new Vec2(
-	// 			-Math.sin(front_axle.GetAngle()) * acceration_force,
-	// 			Math.cos(front_axle.GetAngle()) * acceration_force
-	// 		),
-	// 		front_axle.GetWorldCenter()
-	// 	);
-	// } else {
-		
-	// }
+	let acceration_force: number = 1;
 
 	if (model.human_controlled_car === undefined || model.human_controlled_car.user_data != car.user_data) {
+		// aceleration
+
 		car.front_axle.ApplyForce(
 				new Vec2(
 					Math.sin(car.front_axle.GetAngle()) * output[0][0] * acceration_force * delta,
@@ -596,26 +568,15 @@ function step_car(model: SimulationModel, car: Car, delta: number): Car {
 
 		// steering
 
-		// console.log(output_non_activated[0][1], output[0][1]);
+		let steering: number = (0.7 - output_non_activated[0][1]);
 
-		let steering: number = (0.8 - output_non_activated[0][1]);
-
-		let torque: number = 50;
-
-		// if (cursors.left.isDown) {
-		// 	front_axle_joint.SetMotorSpeed(-torque);
-		// } else if (cursors.right.isDown) {
-		// 	front_axle_joint.SetMotorSpeed(torque);
-		// } else if (output_non_activated[0][1] == 0) {
-		// 	if (front_axle_joint.GetJointAngle() != 0) {
-		// 		if (front_axle_joint.GetJointAngle() > 0)
-		// 			front_axle_joint.SetMotorSpeed(-torque);
-		// 		else
-		// 			front_axle_joint.SetMotorSpeed(torque);
-		// 	}
-		// }
+		let torque: number = 30;
 
 		car.front_axle_joint.SetMotorSpeed(torque * steering * delta);
+		// car.front_axle.SetAngle(
+		// 	car.car_body.GetAngle() + deg_to_rad(
+		// 		convert_number(
+		// 			output_non_activated[0][1], [0, 1], [-90, 90])));
 	}
 
 	return car;

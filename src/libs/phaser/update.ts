@@ -59,7 +59,7 @@ function update (time, delta) {
 
 	// box2d step
 
-	sm.world.Step(1 / 10, 10, 10);
+	sm.world.Step(1 / fps, 10, 10);
 	// sm.world.DrawDebugData();
 	sm.world.ClearForces();
 
@@ -94,7 +94,7 @@ function update (time, delta) {
 
 	// keyboard controls
 
-	const acceration_force: number = 1000;
+	const acceration_force: number = 10;
 
 	if (sm.human_controlled_car !== undefined) {
 		if (cursors.up.isDown) {

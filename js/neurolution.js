@@ -111,6 +111,9 @@ function gaussian(mean, stdev) {
         return -retval;
     };
 }
+function convert_number(old_value, old_range, new_range) {
+    return ((old_value - old_range[0]) / (old_range[1] - old_range[0])) * (new_range[1] - new_range[0]) + new_range[0];
+}
 function prepare_world(scene) {
     // world
     var world = new box2d.b2World(new Vec2(0, 0), true);
@@ -129,11 +132,7 @@ function prepare_world(scene) {
             var car = sm.generations[a["generation_index"]].cars[a["car_index"]];
             mark_car_for_destruction(car);
         }
-        // if ()
-        // 	remove_car_from_world(sm, c);
     };
-    // contact_listener.EndContact = function(c) {
-    // };
     world.SetContactListener(contact_listener);
     // road track
     var road_tracks_left = {
@@ -153,7 +152,6 @@ function prepare_world(scene) {
         scene: scene,
         world: world
     };
-    // left
     add_road_track_segment(road_tracks_left, [0, 0], deg_to_rad(0));
     add_road_track_segment(road_tracks_right, [0, 0], deg_to_rad(0));
     add_road_track_segment(road_tracks_left, [0, 0], deg_to_rad(0));
@@ -179,34 +177,65 @@ function prepare_world(scene) {
     add_road_track_segment(road_tracks_left, [18 * 5 - 2, 5 * 7], deg_to_rad(45));
     add_road_track_segment(road_tracks_right, [19 * 6, 5 * 14 + 3], deg_to_rad(75));
     add_road_track_segment(road_tracks_left, [18 * 7 - 10, 5 * 15 - 2], deg_to_rad(75));
+    add_road_track_segment(road_tracks_left, [18 * 8 - 6, 5 * 25 - 2], deg_to_rad(90));
     add_road_track_segment(road_tracks_right, [19 * 7, 5 * 24 + 1], deg_to_rad(90));
-    // add_road_track_segment(road_tracks_left, [-7, 2], deg_to_rad(-10));
-    // add_road_track_segment(road_tracks_left, [5, 2], deg_to_rad(10));
-    // add_road_track_segment(road_tracks_left, [40, 5], deg_to_rad(20));
-    // add_road_track_segment(road_tracks_left, [40, 5], deg_to_rad(10));
-    // add_road_track_segment(road_tracks_left, [5, 5], deg_to_rad(-10));
-    // add_road_track_segment(road_tracks_left, [-33, 7], deg_to_rad(-20));
-    // add_road_track_segment(road_tracks_left, [-63, 20], deg_to_rad(-40));
-    // add_road_track_segment(road_tracks_left, [-94, 41], deg_to_rad(-50));
-    // add_road_track_segment(road_tracks_left, [-75, 30], deg_to_rad(-20));
-    // add_road_track_segment(road_tracks_left, [-19, 7], deg_to_rad(0));
-    // add_road_track_segment(road_tracks_left, [28, 7], deg_to_rad(20));
-    // add_road_track_segment(road_tracks_left, [63, 15], deg_to_rad(30));
-    // add_road_track_segment(road_tracks_left, [88, 31], deg_to_rad(45));
-    // add_road_track_segment(road_tracks_left, [105, 55], deg_to_rad(55));
-    // add_road_track_segment(road_tracks_right, [-7, 2], deg_to_rad(-10));
-    // add_road_track_segment(road_tracks_right, [5, 2], deg_to_rad(10));
-    // add_road_track_segment(road_tracks_right, [40, 5], deg_to_rad(20));
-    // add_road_track_segment(road_tracks_right, [40, 5], deg_to_rad(10));
-    // add_road_track_segment(road_tracks_right, [5, 5], deg_to_rad(-10));
-    // add_road_track_segment(road_tracks_right, [-33, 7], deg_to_rad(-20));
-    // add_road_track_segment(road_tracks_right, [-63, 20], deg_to_rad(-40));
-    // add_road_track_segment(road_tracks_right, [-94, 41], deg_to_rad(-50));
-    // add_road_track_segment(road_tracks_right, [-75, 30], deg_to_rad(-20));
-    // add_road_track_segment(road_tracks_right, [-19, 7], deg_to_rad(0));
-    // add_road_track_segment(road_tracks_right, [28, 7], deg_to_rad(20));
-    // add_road_track_segment(road_tracks_right, [73, 21], deg_to_rad(40));
-    // add_road_track_segment(road_tracks_right, [105, 47], deg_to_rad(55));
+    add_road_track_segment(road_tracks_left, [18 * 8 - 6, 5 * 28], deg_to_rad(90));
+    add_road_track_segment(road_tracks_right, [19 * 7, 5 * 27 + 5], deg_to_rad(90));
+    add_road_track_segment(road_tracks_left, [18 * 8 - 6, 5 * 28], deg_to_rad(90));
+    add_road_track_segment(road_tracks_right, [19 * 7, 5 * 27 + 5], deg_to_rad(90));
+    add_road_track_segment(road_tracks_left, [18 * 8 - 6, 5 * 31 + 2], deg_to_rad(105));
+    add_road_track_segment(road_tracks_left, [18 * 8 - 15, 5 * 37 + 3], deg_to_rad(115));
+    add_road_track_segment(road_tracks_right, [19 * 7, 5 * 33 + 7], deg_to_rad(115));
+    add_road_track_segment(road_tracks_left, [110, 220], deg_to_rad(135));
+    add_road_track_segment(road_tracks_right, [110, 220], deg_to_rad(135));
+    add_road_track_segment(road_tracks_left, [65, 255], deg_to_rad(165));
+    add_road_track_segment(road_tracks_right, [65, 255], deg_to_rad(165));
+    add_road_track_segment(road_tracks_left, [25, 275], deg_to_rad(175));
+    add_road_track_segment(road_tracks_right, [17, 275], deg_to_rad(180));
+    add_road_track_segment(road_tracks_left, [28, 275], deg_to_rad(160));
+    add_road_track_segment(road_tracks_right, [22, 275], deg_to_rad(160));
+    add_road_track_segment(road_tracks_left, [75, 250], deg_to_rad(130));
+    add_road_track_segment(road_tracks_right, [74, 250], deg_to_rad(130));
+    add_road_track_segment(road_tracks_left, [95, 130], deg_to_rad(40));
+    add_road_track_segment(road_tracks_right, [120, 210], deg_to_rad(110));
+    add_road_track_segment(road_tracks_right, [125, 130], deg_to_rad(60));
+    add_road_track_segment(road_tracks_right, [95, 45], deg_to_rad(30));
+    add_road_track_segment(road_tracks_left, [65, 25], deg_to_rad(20));
+    add_road_track_segment(road_tracks_right, [60, 13], deg_to_rad(20));
+    add_road_track_segment(road_tracks_left, [22, 5], deg_to_rad(0));
+    add_road_track_segment(road_tracks_right, [30, 5], deg_to_rad(5));
+    // 2nd part
+    road_tracks_left.relative_position[0] = 1500;
+    road_tracks_left.relative_position[1] = -980;
+    road_tracks_right.relative_position[0] = road_tracks_left.relative_position[0] + 130;
+    road_tracks_right.relative_position[1] = road_tracks_left.relative_position[1];
+    add_road_track_segment(road_tracks_left, [-7, 2 + 2], deg_to_rad(-10));
+    add_road_track_segment(road_tracks_right, [-7, 2], deg_to_rad(-10));
+    add_road_track_segment(road_tracks_left, [5 - 4, 2 + 2 * 2], deg_to_rad(10));
+    add_road_track_segment(road_tracks_right, [5 - 4, 2], deg_to_rad(10));
+    add_road_track_segment(road_tracks_left, [40 - 2 * 3, 5 + 2], deg_to_rad(20));
+    add_road_track_segment(road_tracks_right, [40 - 2 * 3, 5], deg_to_rad(20));
+    add_road_track_segment(road_tracks_left, [40 - 2 * 3, 5 + 2], deg_to_rad(10));
+    add_road_track_segment(road_tracks_right, [40 - 2 * 3, 5], deg_to_rad(10));
+    add_road_track_segment(road_tracks_left, [5 - 2 * 3, 5 + 2], deg_to_rad(-10));
+    add_road_track_segment(road_tracks_right, [5 - 2 * 3, 5], deg_to_rad(-10));
+    add_road_track_segment(road_tracks_left, [-33 - 2 * 2, 7 + 2], deg_to_rad(-20));
+    add_road_track_segment(road_tracks_right, [-33 - 2 * 2, 7], deg_to_rad(-20));
+    add_road_track_segment(road_tracks_left, [-63 - 2 * 3, 20 + 2], deg_to_rad(-40));
+    add_road_track_segment(road_tracks_right, [-63 - 2 * 3, 20], deg_to_rad(-40));
+    add_road_track_segment(road_tracks_left, [-94 - 2 * 3, 41 + 2], deg_to_rad(-50));
+    add_road_track_segment(road_tracks_right, [-94 - 2 * 2, 41 + 2], deg_to_rad(-50));
+    add_road_track_segment(road_tracks_left, [-75 + 2 * 1, 30 + 2], deg_to_rad(-20));
+    add_road_track_segment(road_tracks_right, [-75 - 2, 30], deg_to_rad(-20));
+    add_road_track_segment(road_tracks_left, [-19 - 2 * 2, 7 + 2], deg_to_rad(0));
+    add_road_track_segment(road_tracks_right, [-19 - 2 * 3, 7], deg_to_rad(0));
+    add_road_track_segment(road_tracks_left, [28 - 2 * 3, 7 + 2], deg_to_rad(20));
+    add_road_track_segment(road_tracks_right, [28 - 2 * 3, 7], deg_to_rad(20));
+    add_road_track_segment(road_tracks_left, [63 - 2 * 3, 15 + 2], deg_to_rad(30));
+    add_road_track_segment(road_tracks_right, [73 - 2 * 3, 21], deg_to_rad(40));
+    add_road_track_segment(road_tracks_left, [88 - 2 * 3, 31 + 2], deg_to_rad(45));
+    add_road_track_segment(road_tracks_left, [105 - 2, 55], deg_to_rad(55));
+    add_road_track_segment(road_tracks_right, [105 - 2, 47], deg_to_rad(55));
     return world;
 }
 function tan_h(x) {
@@ -228,69 +257,78 @@ function sigmoid_prime(x) {
     return Math.exp(-x) / Math.pow(1 + Math.exp(-x), 2);
 }
 // imperative
-function random_weights(layer_sizes) {
-    var weights = [];
-    var i;
-    for (i in range(len(layer_sizes))) {
-        // skip the first layer, as it has no previous layer
-        if (i != 0) {
-            weights.push(nj.random(layer_sizes[i - 1], layer_sizes[i]).tolist());
-        }
-    }
-    return weights;
-}
 // function random_weights(layer_sizes: number[]): any {
 //     let weights: any = [];
-//     const normal_dist = gaussian(0, 1);
 //     let i: any;
 //     for (i in range(len(layer_sizes))) {
 //         // skip the first layer, as it has no previous layer
 //         if(i != 0) {
-//             const r: number[] = range(layer_sizes[i - 1]);
-//             const c: number[] = range(layer_sizes[i]);
-//             weights.push([]);
-//             r.forEach(function(i: number) {
-//                 let rows: number[] = [];
-//                 c.forEach(function(j: number) {
-//                     rows.push(normal_dist());
-//                 });
-//                 weights[len(weights) - 1].push(rows);
-//             });
+//             weights.push(
+//                 nj.random(
+//                     layer_sizes[i - 1], layer_sizes[i]).tolist());
 //         }
 //     }
 //     return weights;
 // }
-// function random_biases(layer_sizes: number[]): any {
-//     let biases: any = [];
-//     const normal_dist = gaussian(0, 1);
-//     let i: any;
-//     for (i in range(len(layer_sizes))) {
-//         // skip the first layer, as it has no previous layer
-//         if(i != 0) {
-//             const r: number[] = range(1);
-//             const c: number[] = range(layer_sizes[i]);
-//             biases.push([]);
-//             r.forEach(function(i: number) {
-//                 let rows: number[] = [];
-//                 c.forEach(function(j: number) {
-//                     rows.push(normal_dist());
-//                 });
-//                 biases[len(biases) - 1].push(rows);
-//             });
-//         }
-//     }
-//     return biases;
-// }
+function random_weights(layer_sizes) {
+    var weights = [];
+    // const normal_dist = gaussian(0, 1);
+    var i;
+    var _loop_1 = function () {
+        // skip the first layer, as it has no previous layer
+        if (i != 0) {
+            var r = range(layer_sizes[i - 1]);
+            var c_1 = range(layer_sizes[i]);
+            weights.push([]);
+            r.forEach(function (i) {
+                var rows = [];
+                c_1.forEach(function (j) {
+                    rows.push(random(-1, 1));
+                });
+                weights[len(weights) - 1].push(rows);
+            });
+        }
+    };
+    for (i in range(len(layer_sizes))) {
+        _loop_1();
+    }
+    return weights;
+}
 function random_biases(layer_sizes) {
     var biases = [];
+    // const normal_dist = gaussian(0, 1);
     var i;
-    for (i in range(len(layer_sizes))) {
+    var _loop_2 = function () {
         // skip the first layer, as it has no previous layer
-        if (i != 0)
-            biases.push(nj.random(1, layer_sizes[i]).tolist());
+        if (i != 0) {
+            var r = range(1);
+            var c_2 = range(layer_sizes[i]);
+            biases.push([]);
+            r.forEach(function (i) {
+                var rows = [];
+                c_2.forEach(function (j) {
+                    rows.push(random(-1, 1));
+                });
+                biases[len(biases) - 1].push(rows);
+            });
+        }
+    };
+    for (i in range(len(layer_sizes))) {
+        _loop_2();
     }
     return biases;
 }
+// function random_biases(layer_sizes: number[]): any {
+//     let biases: any = [];
+//     let i: any;
+//     for (i in range(len(layer_sizes))) {
+//         // skip the first layer, as it has no previous layer
+//         if(i != 0)
+//             biases.push(
+//                 nj.random(1, layer_sizes[i]).tolist());
+//     }
+//     return biases;
+// }
 // functional
 function activate(x) {
     for (var i = 0; i < x.selection.data.length; i++) {
@@ -449,7 +487,7 @@ function last_generation(model) {
     return model.generations[len(model.generations) - 1];
 }
 function breed_generation(model) {
-    var selection_count = 5;
+    var selection_count = 4;
     // const selection_count: number = Math.ceil(0.1 * model.population_size);
     var mutation_rate = 0.02;
     // natural selection
@@ -462,20 +500,8 @@ function breed_generation(model) {
     model.generations.push(new_gen);
     // fill the new generation by crossovers
     while (len(new_gen.cars) != model.population_size) {
-        // let random_nn_a: NeuralNetworkModel = 
-        // 	fittest_individuals[
-        // 		Math.floor(
-        // 			Math.random() * len(fittest_individuals))].nn;
-        // let random_nn_b: NeuralNetworkModel =
-        // 	fittest_individuals[
-        // 		Math.floor(
-        // 			Math.random() * len(fittest_individuals))].nn;
         new_gen.cars.push(crossover(model, fittest_individuals));
     }
-    // mutate the neural networks
-    // for (var i = 0; i < len(new_gen); i++) {
-    // 	model.generations[len(model.generations) - 1][i] = mutate(model.generations[len(model.generations) - 1][i], mutation_rate);
-    // }
     // mutate the newly formed generation
     new_gen.cars.forEach(function (car) {
         car.nn = mutate(car.nn, mutation_rate);
@@ -489,9 +515,6 @@ function get_car(model, index) {
 function crossover(model, individuals) {
     var new_car = create_car(model);
     var x = 0;
-    // let size_x: number = len(new_car.nn.weights);
-    // let size_y: number = len(new_car.nn.weights[0]);
-    // let size_z: number = len(new_car.nn.weights[0][0]);
     var individuals_count = len(individuals);
     // weights
     new_car.nn.weights.forEach(function (weight_layer) {
@@ -523,35 +546,6 @@ function crossover(model, individuals) {
         x++;
     });
     return new_car;
-    // weights
-    // 	let new_weights: any[] = [];
-    // 	// i -> matrix representing weights between 2 layers
-    // 	for (var i in range(len(parent_a.weights))) {
-    // 		new_weights.push([]);
-    // 		let size_y = len(parent_a.weights[i]);
-    // 		let size_x = len(parent_a.weights[i][0]);
-    // 		for (var j in range(size_y)) {
-    // 			new_weights[i].push([]);
-    // 			for (var k in range(size_x)) {
-    // 				new_weights[i][j].push([]);
-    // 				if (Math.round(random(0, 1)) == 0)
-    // 					new_weights[i][j][k] = parent_a.weights[i][j][k];
-    // 				else
-    // 					new_weights[i][j][k] = parent_b.weights[i][j][k];
-    // 			}
-    // 		}
-    // 	}
-    // // 	// TODO: Biases
-    // 	// child
-    // 	let child: NeuralNetworkModel =  {
-    // 		weights: new_weights,
-    // 		biases: parent_a.biases,
-    // 		layer_sizes: parent_a.layer_sizes,
-    // 		layers: [],
-    // 		identity_biases: undefined,
-    // 		non_activated_layers: []
-    // 	};
-    // 	return child;
 }
 function best_fit_select(model, quantity) {
     var individuals = last_generation(model);
@@ -714,7 +708,14 @@ function create() {
     });
     // add_car_to_world(sm, car2);
     // add_car_to_scene(sm, car2);
+    if (sm.paused)
+        sm.scene.scene.pause();
+    else
+        sm.scene.scene.resume();
+    // this.cameras.main.setZoom(0.5);
+    // this.cameras.main.setScroll(1000, -1000);
 }
+var fps = 30;
 var config = {
     type: Phaser.AUTO,
     width: 700,
@@ -724,7 +725,7 @@ var config = {
         create: create,
         update: update
     },
-    fps: 10
+    fps: fps
 };
 var PVec2 = Phaser.Math.Vector2;
 var sm;
@@ -764,23 +765,6 @@ document.addEventListener("keyup", function (e) {
             sm.human_controlled_car = undefined;
         }
 });
-function gameover(scene, time) {
-    scene.scene.restart();
-    // 	let average_speed = total_distance / ((scene.time.now - starting_time) / 1000);
-    // 	let fitness_value = total_distance * average_speed;
-    // 	console.log(fitness_value);
-    // 	model = set_fitness(fitness_value, current_individual_index, model);
-    // 	current_individual_index = increment(current_individual_index, model);
-    // 	// next individual is the first one from new generation
-    // 	if (current_individual_index[0] != 0 && current_individual_index[1] == 0) {
-    // 		model = new_generation(model);
-    // 		console.log("New generation!");
-    // 		console.log(model);
-    // 		// scene.scene.stop();
-    // 		return;
-    // 	}
-    // 	current_individual = get_individual(current_individual_index, model);
-}
 function preload() {
     // images
     this.load.image('car', 'assets/car.png');
@@ -788,7 +772,7 @@ function preload() {
     sm = {
         generations: [],
         current_generation_index: 0,
-        population_size: 50,
+        population_size: 100,
         layer_sizes: [3, 5, 3, 2],
         world: prepare_world(this),
         scene: this,
@@ -839,7 +823,7 @@ function update(time, delta) {
         furthest_car = lg.cars[0];
     }
     // box2d step
-    sm.world.Step(1 / 10, 10, 10);
+    sm.world.Step(1 / fps, 10, 10);
     // sm.world.DrawDebugData();
     sm.world.ClearForces();
     // cars step
@@ -862,7 +846,7 @@ function update(time, delta) {
     best_fit_car_sensors_text.setText("Sensors: " + Math.round(furthest_car.lsv * 100) / 100 + ", " + Math.round(furthest_car.csv * 100) / 100 + ", " + Math.round(furthest_car.rsv * 100) / 100);
     best_fit_car_sensors_text.setPosition(this.cameras.main.scrollX + 10, this.cameras.main.scrollY + 80);
     // keyboard controls
-    var acceration_force = 1000;
+    var acceration_force = 10;
     if (sm.human_controlled_car !== undefined) {
         if (cursors.up.isDown) {
             sm.human_controlled_car.front_axle.ApplyForce(new Vec2(Math.sin(sm.human_controlled_car.front_axle.GetAngle()) * acceration_force, -Math.cos(sm.human_controlled_car.front_axle.GetAngle()) * acceration_force), sm.human_controlled_car.front_axle.GetWorldCenter());
@@ -894,15 +878,15 @@ function add_car_to_world(model, car) {
     car_body_shape.SetAsBox(23 / SCALE, 50 / SCALE);
     var car_body_fix_def = new box2d.b2FixtureDef();
     car_body_fix_def.shape = car_body_shape;
-    car_body_fix_def.density = 10;
+    car_body_fix_def.density = 1;
     car_body_fix_def.userData = car.user_data;
     car_body_fix_def.filter.categoryBits = category.car;
     car_body_fix_def.filter.maskBits = mask.car;
     var car_body_def = new box2d.b2BodyDef();
     car_body_def.position = new Vec2(180 / SCALE, 300 / SCALE);
     car_body_def.type = box2d.b2Body.b2_dynamicBody;
-    car_body_def.linearDamping = 10;
-    car_body_def.angularDamping = 10;
+    car_body_def.linearDamping = 1;
+    car_body_def.angularDamping = 3;
     var car_body = model.world.CreateBody(car_body_def);
     car_body.CreateFixture(car_body_fix_def);
     // front axle
@@ -1135,13 +1119,6 @@ function step_car(model, car, delta) {
     var forward_propagated_nn = forward_propagate(car.nn);
     var output = last_layer(forward_propagated_nn);
     var output_non_activated = last_non_activated_layer(forward_propagated_nn);
-    // steering_text.setText("Output: " + Math.round(output[0][0] * 100) / 100 + ", " + Math.round(steering * 100) / 100);
-    // steering_text.setPosition(this.cameras.main.scrollX + 5, this.cameras.main.scrollY + 130);
-    // if (output[0][2] >= 0.5)
-    // 	acceleration = 1;
-    // console.log(output[0][0]);
-    // console.log(output[0][1]);
-    // console.log(output[0][2]);
     // wheel views
     car.front_axle_view.rotation = car.front_axle.GetAngle() - car.car_body.GetAngle();
     // car view
@@ -1149,44 +1126,18 @@ function step_car(model, car, delta) {
     car.car_container.y = car.car_body.GetPosition().y * SCALE;
     car.car_container.setRotation(car.car_body.GetAngle());
     // movement
-    var acceration_force = 20;
-    // if (cursors.up.isDown) {
-    // 	front_axle.ApplyForce(
-    // 		new Vec2(
-    // 			Math.sin(front_axle.GetAngle()) * acceration_force,
-    // 			-Math.cos(front_axle.GetAngle()) * acceration_force
-    // 		),
-    // 		front_axle.GetWorldCenter()
-    // 	);
-    // } else if (cursors.down.isDown) {
-    // 	front_axle.ApplyForce(
-    // 		new Vec2(
-    // 			-Math.sin(front_axle.GetAngle()) * acceration_force,
-    // 			Math.cos(front_axle.GetAngle()) * acceration_force
-    // 		),
-    // 		front_axle.GetWorldCenter()
-    // 	);
-    // } else {
-    // }
+    var acceration_force = 1;
     if (model.human_controlled_car === undefined || model.human_controlled_car.user_data != car.user_data) {
+        // aceleration
         car.front_axle.ApplyForce(new Vec2(Math.sin(car.front_axle.GetAngle()) * output[0][0] * acceration_force * delta, -Math.cos(car.front_axle.GetAngle()) * output[0][0] * acceration_force * delta), car.front_axle.GetWorldCenter());
         // steering
-        // console.log(output_non_activated[0][1], output[0][1]);
-        var steering = (0.8 - output_non_activated[0][1]);
-        var torque = 50;
-        // if (cursors.left.isDown) {
-        // 	front_axle_joint.SetMotorSpeed(-torque);
-        // } else if (cursors.right.isDown) {
-        // 	front_axle_joint.SetMotorSpeed(torque);
-        // } else if (output_non_activated[0][1] == 0) {
-        // 	if (front_axle_joint.GetJointAngle() != 0) {
-        // 		if (front_axle_joint.GetJointAngle() > 0)
-        // 			front_axle_joint.SetMotorSpeed(-torque);
-        // 		else
-        // 			front_axle_joint.SetMotorSpeed(torque);
-        // 	}
-        // }
+        var steering = (0.7 - output_non_activated[0][1]);
+        var torque = 30;
         car.front_axle_joint.SetMotorSpeed(torque * steering * delta);
+        // car.front_axle.SetAngle(
+        // 	car.car_body.GetAngle() + deg_to_rad(
+        // 		convert_number(
+        // 			output_non_activated[0][1], [0, 1], [-90, 90])));
     }
     return car;
 }

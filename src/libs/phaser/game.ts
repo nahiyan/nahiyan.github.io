@@ -1,5 +1,7 @@
 declare var Phaser: any;
 
+let fps: number = 30;
+
 var config: object = {
     type: Phaser.AUTO,
     width: 700,
@@ -9,7 +11,7 @@ var config: object = {
         create: create,
         update: update
     },
-    fps: 10
+    fps: fps
 };
 
 let PVec2: any = Phaser.Math.Vector2;

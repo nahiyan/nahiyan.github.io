@@ -29,4 +29,13 @@ function create() {
 
 	// add_car_to_world(sm, car2);
 	// add_car_to_scene(sm, car2);
+
+	if (sm.paused)
+        sm.scene.scene.pause();
+    else
+        sm.scene.scene.resume();
+
+    // this.cameras.main.setZoom(0.5);
+
+    // this.cameras.main.setScroll(1000, -1000);
 }

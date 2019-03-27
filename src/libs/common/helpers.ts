@@ -119,7 +119,7 @@ function rand_int(min: number, max: number): number {
     return Math.floor(Math.random() * max) + min;  
 }
 
-function random(min, max) {
+function random(min: number, max: number): number {
     return Math.random() * (max - min) + min;
 }
 
@@ -127,14 +127,14 @@ function add(a, b) {
     return new Vec2(a.x + b.x, a.y + b.y);
 }
 
-function rad_to_deg(value) {
+function rad_to_deg(value: number): number {
     // 1 pi rad = 180 deg
     // x rad = (180 / pi) * x
 
     return value * (180 / Math.PI);
 }
 
-function deg_to_rad(value) {
+function deg_to_rad(value: number): number {
     // 180 deg = 1 pi rad
     // x deg = (1 pi / 180) * x
     return (Math.PI / 180) * value;
@@ -167,4 +167,8 @@ function gaussian(mean: number, stdev: number) {
            return retval;
        return -retval;
    }
+}
+
+function convert_number(old_value: number, old_range: number[], new_range: number[]): number {
+    return ( (old_value - old_range[0]) / (old_range[1] - old_range[0]) ) * (new_range[1] - new_range[0]) + new_range[0];
 }
