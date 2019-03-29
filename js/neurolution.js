@@ -712,8 +712,8 @@ function create() {
         sm.scene.scene.pause();
     else
         sm.scene.scene.resume();
-    // this.cameras.main.setZoom(0.5);
-    // this.cameras.main.setScroll(1000, -1000);
+    this.cameras.main.setZoom(0.2);
+    this.cameras.main.setScroll(1000, -1000);
 }
 var fps = 30;
 var config = {
@@ -776,7 +776,7 @@ function preload() {
         layer_sizes: [3, 5, 3, 2],
         world: prepare_world(this),
         scene: this,
-        paused: false,
+        paused: true,
         human_controlled_car: undefined,
         show_sensors: false
     };

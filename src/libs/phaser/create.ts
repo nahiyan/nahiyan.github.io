@@ -35,7 +35,7 @@ function create() {
     else
         sm.scene.scene.resume();
 
-    // this.cameras.main.setZoom(0.5);
+    this.cameras.main.setZoom(0.2);
 
-    // this.cameras.main.setScroll(1000, -1000);
+    this.cameras.main.setScroll(1000, -1000);
 }
