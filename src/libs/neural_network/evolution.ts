@@ -80,6 +80,11 @@ function last_generation(model: SimulationModel): Generation {
 }
 
 function breed_generation(model: SimulationModel): SimulationModel {
+	console.log("Generation: ", len(model.generations));
+	last_generation(model).cars.forEach(function(car: Car){
+		console.log(car.fitness);
+	});
+
 	const selection_count: number = 4;
 
 	// const selection_count: number = Math.ceil(0.1 * model.population_size);
@@ -185,6 +190,10 @@ function best_fit_select(model: SimulationModel, quantity: number): Car[] {
 	});
 
 	let selected_individuals: Car[] = individuals.cars.splice(0, quantity);
+
+	// selected_individuals.forEach(function(i){
+	// 	console.log("Generation: ", model.current_generation_index + 1, "\t", i.fitness);
+	// });
 
 	return selected_individuals;
 }

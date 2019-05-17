@@ -487,6 +487,10 @@ function last_generation(model) {
     return model.generations[len(model.generations) - 1];
 }
 function breed_generation(model) {
+    console.log("Generation: ", len(model.generations));
+    last_generation(model).cars.forEach(function (car) {
+        console.log(car.fitness);
+    });
     var selection_count = 4;
     // const selection_count: number = Math.ceil(0.1 * model.population_size);
     var mutation_rate = 0.02;
@@ -553,6 +557,9 @@ function best_fit_select(model, quantity) {
         return b.fitness - a.fitness;
     });
     var selected_individuals = individuals.cars.splice(0, quantity);
+    // selected_individuals.forEach(function(i){
+    // 	console.log("Generation: ", model.current_generation_index + 1, "\t", i.fitness);
+    // });
     return selected_individuals;
 }
 // function test_result(value, fail_message) {
