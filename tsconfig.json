@@ -1,7 +1,7 @@
 {
 	"compilerOptions": {
 		"lib": ["es2018", "dom"],
-		"outFile": "js/neurolution.js",
+		"outFile": "static/js/neurolution.js",
 		"downlevelIteration": true
 	},
 	"include": [
